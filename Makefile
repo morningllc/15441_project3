@@ -3,7 +3,7 @@
 #
 CC 		= gcc
 CFLAGS= -Wall -Werror -g -std=gnu99 
-OBJS		= proxy.o
+OBJS		= proxy.o proxy_parser.o proxy_socket.o
 .c.o:
 	$(CC)  -c $(CFLAGS) $<
 

@@ -21,7 +21,7 @@
 
  
 #define MAXLINE  8192
-#define BUFFERSIZE 8192
+#define BUFFERSIZE 1024
 #define LISTENQ  1024
 
 #define USAGE "usage: proxy <log> <alpha> <listen-port> <fake-ip> <dns-ip> <dns-port> [<www-ip>]\n"
@@ -49,14 +49,27 @@ typedef struct{
 } client_t;
 
 typedef struct{
+
 	int client_fd;
 	int server_fd;	
 	char *remote_addr;
+
+	char host[MAXLINE];
+	int host_port;
+
 	int method;
 	int version;
+	int request_type;
+	char path[MAXLINE];
+
+	char *urn;
+	int request_rate;
+	int seg_num;
+	int frag_num;
+
 	int close;
 	int contentlen;
-	char uri[MAXLINE];
+	
 	buffer *buf_server;
 	buffer *buf_client;
 	buffer *buf_send;
