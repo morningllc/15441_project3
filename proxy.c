@@ -6,16 +6,17 @@
 
 int verbal = 0;
 
-int main(void){
-	//logWrite(myName,"startEngine","engine starts...");	
+int main(int argc, char **argv){
 	int listenfd,connfd;
-	int clientlen=sizeof(struct sockaddr_in);
+	int addrlen=sizeof(struct sockaddr_in);
 	struct sockaddr_in clientaddr;
 	static pool p;	
 	int port=11223;
 
+	status_t *proxy_stat;
+	proxy_stat = initProxy(argc,argv);
 	initPool(&p);	
-
+	proxy_stat->p=&p;
 
 	if((listenfd=open_listenfd(port))<0){
 		fprintf(stderr, "error in open_listenfd\n");
@@ -26,17 +27,15 @@ int main(void){
 
 	while(1){
 		p.ready_read=p.read_set;
-		p.ready_write=p.write_set;
-		
+		p.ready_write=p.write_set;		
 		
 		if((p.nready=select(p.maxfd+1,&p.ready_read,&p.ready_write,NULL,NULL))<0){
 			fprintf(stderr, "select error\n");
 			exit(0);
-		}
-		
+		}		
 			
 		if(FD_ISSET(listenfd,&p.ready_read)){
-			if((connfd=accept(listenfd,(SA *)&clientaddr,(socklen_t *) &clientlen))<0){
+			if((connfd=accept(listenfd,(SA *)&clientaddr,(socklen_t *) &addrlen))<0){
 				fprintf(stderr, "http accept error\n");
 				continue;
 			}
@@ -47,6 +46,25 @@ int main(void){
     return 0;
 }
 
+status_t* initProxy(int argc, char **argv){
+	if(argc<7||argc>8){
+		fprintf(stderr,USAGE);
+		exit(0);
+	}
+	status_t* proxy = (status_t *)malloc(sizeof(status_t));
+	proxy->logFile = argv[1];
+	proxy->alpha = atof(argv[2]);
+	proxy->listenPort = atoi(argv[3]);
+	proxy->fakeIP = argv[4];
+	proxy->dnsIP = argv[5];
+	proxy->dnsPort = atoi(argv[6]);
+	if(argc == 8)
+		proxy->wwwIP = argv[7];
+	else
+		proxy->wwwIP = NULL;
+	
+	return proxy;
+}
 
 /**
  *	initialize pool
@@ -60,10 +78,8 @@ void initPool(pool *p){
 	FD_ZERO(&p->read_set);
 	FD_ZERO(&p->write_set);
 	FD_ZERO(&p->ready_read);
-	FD_ZERO(&p->ready_write);
-	
-	p->nready=0;
-	
+	FD_ZERO(&p->ready_write);	
+	p->nready=0;	
 }
 
 /**

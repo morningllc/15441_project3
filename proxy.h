@@ -24,6 +24,7 @@
 #define BUFFERSIZE 8192
 #define LISTENQ  1024
 
+#define USAGE "usage: proxy <log> <alpha> <listen-port> <fake-ip> <dns-ip> <dns-port> [<www-ip>]\n"
 typedef struct sockaddr SA;
 
 typedef struct{
@@ -47,6 +48,21 @@ typedef struct{
 	
 } client_t;
 
+typedef struct{
+	int client_fd;
+	int server_fd;	
+	char *remote_addr;
+	int method;
+	int version;
+	int close;
+	int contentlen;
+	char uri[MAXLINE];
+	buffer *buf_server;
+	buffer *buf_client;
+	buffer *buf_send;
+	
+} socket_t;
+
 typedef struct {
 	int maxfd;
 	fd_set read_set;
@@ -59,18 +75,27 @@ typedef struct {
 	client_t clients[FD_SETSIZE];
 } pool;
 
+typedef struct {	
+	float alpha;
+	int listenPort;
+	int dnsPort;
+	char *logFile;
+	char *fakeIP;
+	char *dnsIP;
+	char *wwwIP;
+	pool *p;
+}status_t;
 
+status_t* initProxy(int argc, char **argv);
 
 void initPool(pool *p);
 
-/**
- * add two listen fds to pool
- */
 void setPool(int httpfd,pool *p);
 
 void addClient(int connfd,pool *p,struct sockaddr_in clientaddr);
 
 void checkClients(pool *p);
+
 int open_listenfd(int port) ;
 
 
