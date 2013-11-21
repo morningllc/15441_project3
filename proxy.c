@@ -85,35 +85,8 @@ void initPool(pool *p){
 	FD_ZERO(&p->ready_write);	
 	p->nready=0;	
 }
-// /**
-//  *
-//  */
-//  void initSocketPair(socket_t *pair){
-//  	pair->client_fd=-1;
-//  	pair->server_fd=-1;
-//  	pair->remote_addr=NULL;
- 	
-//  	bzero(pair->host, sizeof(char)*MAXLINE);
-//  	pair->host_port=-1;
 
-//  	pair->method=-1;
-//  	pair->version=-1;
-//  	pair->request_type=-1;
-//  	bzero(pair->path, sizeof(char)*MAXLINE);
 
-//  	pair->urn=NULL;
-//  	pair->request_rate=-1;
-//  	pair->seg_num=-1;
-//  	pair->frag_num=-1;
-
-//  	pair->close=-1;
-//  	pair->contentlen=-1;
-
-//  	pair->buf_server=NULL;
-// 	pair->buf_client=NULL;
-// 	pair->buf_send_client=NULL;
-// 	pair->buf_send_server=NULL;
-//  }
 /**
  * add two listen fds to pool
  */
