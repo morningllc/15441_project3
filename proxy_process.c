@@ -2,7 +2,6 @@
 #include "proxy.h"
 #include "proxy_socket.h"
 #include "proxy_parser.h"
-
 extern status_t *proxy_stat;
 
 int buildRequestContent(socket_t *pair){
@@ -37,6 +36,7 @@ int buildRequestContent(socket_t *pair){
 	 if(addData(pair->buf_send_server,(void *)request,strlen(request)))
 	 	return -1;
 	 enqueue(pair->requestQueue,pair->request_type);
+	 pair->time = time(NULL);
 	 return 0;
 }
 int buildManifestContent(socket_t *pair,char *header){

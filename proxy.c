@@ -169,7 +169,7 @@ void checkSocketPairs(pool *p){
 						fprintf(stdout, "read server=%d\n",pair->server_fd);
 					p->nready--;
 					//todo read server
-
+					doIt_ReadServer(pair);
 				}
 			}
 		}
@@ -249,6 +249,17 @@ void doIt_ReadServer(socket_t *pair)
 
 void doIt_Process(socket_t *pair)
 {
+  if(pair->server_fd < 0){
+  	open_serverfd(pair);
+		if(pair->server_fd > proxy_stat->p->maxfd){
+			proxy_stat->p->maxfd = pair->server_fd;
+			FD_SET(pair->server_fd, &proxy_stat->p->read_set);
+		}
+	}
+	if(buildRequestContent(pair)>=0){
+		FD_SET(pair->client_fd, &proxy_stat->p->write_set);
+		FD_SET(pair->server_fd, &proxy_stat->p->write_set);
+	}
 }
 
 /**

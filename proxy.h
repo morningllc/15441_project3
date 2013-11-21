@@ -17,6 +17,7 @@
 #include <sys/mman.h>
 #include <sys/types.h>      
 #include <fcntl.h>
+#include <time.h>
 
 #include "proxy_queue.h"
  
@@ -57,7 +58,8 @@ typedef struct{
 	int frag_num;
 
 	int close;
-	
+
+	time_t time;	
 	int recv;
 	int left;
 	int contentlen;
