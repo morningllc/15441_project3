@@ -105,6 +105,36 @@ int parseServerResponse(socket_t *pair)
 	return 0;
 }
 
+int parseManifestFile(char *buf)
+{
+  int bitrate = 0;
+	char *ptr = NULL;
+
+  if((ptr = strstr(buf, "bitrate"))==NULL)
+		return -1;
+  sscanf(ptr, "bitrate=\"%d\"",&bitrate);
+  proxy_stat->bitrates[0] = bitrate;
+
+  if((ptr = strstr(ptr+sizeof("bitrate"), "bitrate"))==NULL)
+		return -1;
+  sscanf(ptr, "bitrate=\"%d\"",&bitrate);
+  proxy_stat->bitrates[1] = bitrate;
+
+  if((ptr = strstr(ptr+sizeof("bitrate"), "bitrate"))==NULL)
+		return -1;
+  sscanf(ptr, "bitrate=\"%d\"",&bitrate);
+  proxy_stat->bitrates[2] = bitrate;
+
+  if((ptr = strstr(ptr+sizeof("bitrate"), "bitrate"))==NULL)
+		return -1;
+  sscanf(ptr, "bitrate=\"%d\"",&bitrate);
+  proxy_stat->bitrates[3] = bitrate;
+
+	proxy_stat->bitrate = proxy_stat->bitrates[0];
+
+	return 0;
+}
+
 int parseLine(socket_t *pair, char *buf)
 {
 	if(strstr(buf, "Content-Length")){
