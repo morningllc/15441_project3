@@ -89,7 +89,7 @@ int parseMethod(socket_t *pair,char *buf){
 	return 0;
 }
 
-int parseServerResponse(socket_t *pair)
+int parseServerHeader(socket_t *pair)
 {
 	char buf[MAXLINE] = {0};
 	do{
@@ -116,17 +116,17 @@ int parseManifestFile(char *buf)
   sscanf(ptr, "bitrate=\"%d\"",&bitrate);
   proxy_stat->bitrates[0] = bitrate;
 
-  if((ptr = strstr(ptr+sizeof("bitrate"), "bitrate"))==NULL)
+  if((ptr = strstr(ptr+strlen("bitrate"), "bitrate"))==NULL)
 		return -1;
   sscanf(ptr, "bitrate=\"%d\"",&bitrate);
   proxy_stat->bitrates[1] = bitrate;
 
-  if((ptr = strstr(ptr+sizeof("bitrate"), "bitrate"))==NULL)
+  if((ptr = strstr(ptr+strlen("bitrate"), "bitrate"))==NULL)
 		return -1;
   sscanf(ptr, "bitrate=\"%d\"",&bitrate);
   proxy_stat->bitrates[2] = bitrate;
 
-  if((ptr = strstr(ptr+sizeof("bitrate"), "bitrate"))==NULL)
+  if((ptr = strstr(ptr+strlen("bitrate"), "bitrate"))==NULL)
 		return -1;
   sscanf(ptr, "bitrate=\"%d\"",&bitrate);
   proxy_stat->bitrates[3] = bitrate;
@@ -141,7 +141,10 @@ int parseLine(socket_t *pair, char *buf)
 	if(strstr(buf, "Content-Length")){
 		int len = 0;
 		sscanf(buf,"Content-Length: %d",&len);
+		pair->recv = 0;
+		pair->left = len;
 		pair->contentlen = len;
+		pair->content_buf = calloc(len,sizeof(char));
 	}
 	return 0;
 }

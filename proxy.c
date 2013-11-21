@@ -227,6 +227,45 @@ void doIt_ReadClient(socket_t *pair){
 
 }
 
+void doIt_ReadServer(socket_t *pair)
+{
+	int readn;
+	if(pair->server_stat == HEADER){
+		readn = serverReadByte(pair);
+    if(readn < 0){
+		}
+		
+		if(strstr(pair->buf_server->buf, "\r\n\r\n") != NULL){
+			parseServerHeader(pair);
+			server_stat = CONTENT;
+		}
+	}
+	else{
+		readn = serverReadContent(pair);
+		if(readn < 0){
+		}
+
+		if(pair->left == 0 && pair->recv == pair->contentlen){
+			if(proxy_stat->request == MANIFEST){
+				parseManifestFile(pair->content_buf);
+			}
+			else if(proxy_stat->request == VIDEO){
+				updateBitRate();
+			}
+			else{
+			}
+
+			pair->recv = 0;
+			pair->left = 0;
+			pair->contentlen = 0;
+			free(pair->content_buf);
+			pair->content_buf = NULL;
+			proxy_stat->request = dequeue(proxy_stat->requestQueue);
+			server_stat = HEADER;
+		}
+	}
+}
+
 void doIt_Process(socket_t *pair)
 {
 }
