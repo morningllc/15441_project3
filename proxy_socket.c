@@ -1,4 +1,5 @@
 #include "proxy_socket.h"
+#include "proxy_queue.h"
 #include "proxy.h"
 
 extern status_t *proxy_stat;
@@ -82,13 +83,18 @@ void initSocketPair(socket_t *pair){
  	pair->close=-1;
  	pair->contentlen=-1;
 
+ 	pair->requestQueue=new_queue();
  	pair->buf_server=NULL;
 	pair->buf_client=NULL;
 	pair->buf_send_client=NULL;
 	pair->buf_send_server=NULL;
  }
 void resetSocketPair(socket_t *s){
-	//fprintf(stdout, "==>in resetClient\n");	
+	//fprintf(stdout, "==>in resetClient\n");
+	if(s->requestQueue!=NULL){
+		free_queue(s->requestQueue);
+		s->requestQueue=NULL;
+	}
 	cleanSocketBuffer(s);
 	initSocketPair(s);
 	//fprintf(stdout, "==>in resetClient ret=%d\n",ret);

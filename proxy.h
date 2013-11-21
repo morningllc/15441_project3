@@ -17,8 +17,7 @@
 #include <sys/types.h>      
 #include <fcntl.h>
 
-
-
+#include "proxy_queue.h"
  
 #define MAXLINE  1024
 #define BUFFERSIZE 8192
@@ -34,19 +33,6 @@ typedef struct{
 	size_t length;
 	size_t size;
 } buffer;
-
-typedef struct{
-	int fd;	
-	char *remote_addr;
-	int method;
-	int version;
-	int close;
-	int contentlen;
-	char uri[MAXLINE];
-	buffer *buf_recv;
-	buffer *buf_send;
-	
-} client_t;
 
 typedef struct{
 
@@ -69,7 +55,8 @@ typedef struct{
 
 	int close;
 	int contentlen;
-	
+
+	queue_t *requestQueue;
 	buffer *buf_server;
 	buffer *buf_client;
 	buffer *buf_send_client;

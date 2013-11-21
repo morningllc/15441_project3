@@ -4,6 +4,7 @@
 #include "proxy.h"
 
 #define MAX_REQLENGTH 8192
+
 buffer *initBuffer();
 void freeBuffer(buffer *b);
 int resetBuffer(buffer *b);
