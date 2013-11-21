@@ -23,4 +23,6 @@
 int parseClientRequest(socket_t *pair);
 int parseMethod(socket_t *pair,char *buf);
 
+int parseLine(socket_t *pair, char *buf);
+int parseServerResponse(socket_t *pair);
 #endif
