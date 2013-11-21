@@ -35,6 +35,8 @@ typedef struct{
 	size_t size;
 } buffer;
 
+typedef enum {HEADER, CONTENT} server_t;
+
 typedef struct{
 
 	int client_fd;
@@ -60,6 +62,8 @@ typedef struct{
 	int left;
 	int contentlen;
 	char *content_buf;
+	
+	server_t server_stat;
 
 	queue_t *requestQueue;
 	buffer *buf_server;

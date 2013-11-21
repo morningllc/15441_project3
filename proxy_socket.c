@@ -81,7 +81,12 @@ void initSocketPair(socket_t *pair){
  	pair->frag_num=-1;
 
  	pair->close=-1;
+	pair->recv = 0;
+	pair->left = 0;
  	pair->contentlen=-1;
+	pair->content_buf = NULL;
+
+	pair->server_stat = HEADER;
 
  	pair->requestQueue=new_queue();
  	pair->buf_server=NULL;
@@ -134,7 +139,8 @@ int serverReadByte(socket_t *pair)
   int fd = pair->server_fd;
 	char *buf = pair->buf_server->buf + pair->buf_server->length;
 
-  if((ssize_t n=recv(fd,buf,1,NULL))<=0){
+	ssize_t n;
+  if((n=recv(fd,buf,1,MSG_DONTWAIT))<=0){
 		return -1;
 	}
 
@@ -149,7 +155,8 @@ int serverReadContent(socket_t *pair)
   char *buf = pair->content_buf + pair->recv;
 	int len = pair->left;
 
-	if((ssize_t n = recv(fd, buf, len, NULL)) <= 0){
+	ssize_t n;
+	if((n = recv(fd, buf, len, MSG_DONTWAIT)) <= 0){
 		return -1;
 	}
 

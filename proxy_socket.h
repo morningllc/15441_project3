@@ -17,6 +17,10 @@ void initSocketPair(socket_t *pair);
 void resetSocketPair(socket_t *s);
 
 int clientReadByte(socket_t *pair);
+
+int serverReadByte(socket_t *pair);
+int serverReadContent(socket_t *pair);
+
 ssize_t readLine(buffer* src,char *usrbuf, ssize_t maxlen);
 
 #endif

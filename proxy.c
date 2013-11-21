@@ -4,6 +4,7 @@
 #include "proxy.h"
 #include "proxy_parser.h"
 #include "proxy_socket.h"
+#include "proxy_process.h"
 
 int verbal = 0;
 status_t *proxy_stat;
@@ -200,6 +201,10 @@ void doIt_ReadClient(socket_t *pair){
 
 }
 
+void updateBitRate()
+{
+}
+
 void doIt_ReadServer(socket_t *pair)
 {
 	int readn;
@@ -210,7 +215,8 @@ void doIt_ReadServer(socket_t *pair)
 		
 		if(strstr(pair->buf_server->buf, "\r\n\r\n") != NULL){
 			parseServerHeader(pair);
-			server_stat = CONTENT;
+			addData(pair->buf_send_client, pair->buf_server->buf, pair->buf_server->length);
+			pair->server_stat = CONTENT;
 		}
 	}
 	else{
@@ -219,13 +225,16 @@ void doIt_ReadServer(socket_t *pair)
 		}
 
 		if(pair->left == 0 && pair->recv == pair->contentlen){
-			if(proxy_stat->request == MANIFEST){
+			int type = dequeue(pair->requestQueue);
+			if(type == TYPE_MANIFEST){
 				parseManifestFile(pair->content_buf);
 			}
-			else if(proxy_stat->request == VIDEO){
+			else if(type == TYPE_VIDEO){
 				updateBitRate();
+				addData(pair->buf_send_client, pair->content_buf, pair->contentlen);
 			}
 			else{
+				addData(pair->buf_send_client, pair->content_buf, pair->contentlen);
 			}
 
 			pair->recv = 0;
@@ -233,8 +242,7 @@ void doIt_ReadServer(socket_t *pair)
 			pair->contentlen = 0;
 			free(pair->content_buf);
 			pair->content_buf = NULL;
-			proxy_stat->request = dequeue(proxy_stat->requestQueue);
-			server_stat = HEADER;
+			pair->server_stat = HEADER;
 		}
 	}
 }
