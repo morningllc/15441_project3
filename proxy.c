@@ -2,9 +2,11 @@
  * Name: Lingchen Li ID:lli
  ****************************************/
 #include "proxy.h"
-
+#include "proxy_parser.h"
+#include "proxy_socket.h"
 
 int verbal = 0;
+status_t *proxy_stat;
 
 int main(int argc, char **argv){
 	int listenfd,connfd;
@@ -12,7 +14,7 @@ int main(int argc, char **argv){
 	struct sockaddr_in clientaddr;
 	static pool p;	
 
-	status_t *proxy_stat;
+	
 	proxy_stat = initProxy(argc,argv);
 	initPool(&p);	
 	proxy_stat->p=&p;
@@ -51,6 +53,7 @@ status_t* initProxy(int argc, char **argv){
 		exit(0);
 	}
 	status_t* proxy = (status_t *)malloc(sizeof(status_t));
+
 	proxy->logFile = argv[1];
 	proxy->alpha = atof(argv[2]);
 	proxy->listenPort = atoi(argv[3]);
@@ -62,6 +65,9 @@ status_t* initProxy(int argc, char **argv){
 	else
 		proxy->wwwIP = NULL;
 	
+	bzero(proxy->bitrates,sizeof(int)*4);
+	proxy->bitrate=0;
+
 	return proxy;
 }
 /**
@@ -79,35 +85,35 @@ void initPool(pool *p){
 	FD_ZERO(&p->ready_write);	
 	p->nready=0;	
 }
-/**
- *
- */
- void initSocketPair(socket_t *pair){
- 	pair->client_fd=-1;
- 	pair->server_fd=-1;
- 	pair->remote_addr=NULL;
+// /**
+//  *
+//  */
+//  void initSocketPair(socket_t *pair){
+//  	pair->client_fd=-1;
+//  	pair->server_fd=-1;
+//  	pair->remote_addr=NULL;
  	
- 	bzero(pair->host, sizeof(char)*MAXLINE);
- 	pair->host_port=-1;
+//  	bzero(pair->host, sizeof(char)*MAXLINE);
+//  	pair->host_port=-1;
 
- 	pair->method=-1;
- 	pair->version=-1;
- 	pair->request_type=-1;
- 	bzero(pair->path, sizeof(char)*MAXLINE);
+//  	pair->method=-1;
+//  	pair->version=-1;
+//  	pair->request_type=-1;
+//  	bzero(pair->path, sizeof(char)*MAXLINE);
 
- 	pair->urn=NULL;
- 	pair->request_rate=-1;
- 	pair->seg_num=-1;
- 	pair->frag_num=-1;
+//  	pair->urn=NULL;
+//  	pair->request_rate=-1;
+//  	pair->seg_num=-1;
+//  	pair->frag_num=-1;
 
- 	pair->close=-1;
- 	pair->contentlen=-1;
+//  	pair->close=-1;
+//  	pair->contentlen=-1;
 
- 	pair->buf_server=NULL;
-	pair->buf_client=NULL;
-	pair->buf_send_client=NULL;
-	pair->buf_send_server=NULL;
- }
+//  	pair->buf_server=NULL;
+// 	pair->buf_client=NULL;
+// 	pair->buf_send_client=NULL;
+// 	pair->buf_send_server=NULL;
+//  }
 /**
  * add two listen fds to pool
  */
@@ -130,6 +136,8 @@ void addSocketPair(int connfd,pool *p,struct sockaddr_in clientaddr){
 			// addr=inet_ntoa(clientaddr.sin_addr);
 			// p->pairs[i].remote_addr=(char *)malloc(sizeof(char)*strlen(addr));
 			// strcpy(p->pairs[i].remote_addr,addr);
+
+			initSocketBuffer(&p->pairs[i]);
 
 			if(connfd>p->maxfd)
 				p->maxfd=connfd;
@@ -171,7 +179,7 @@ void checkSocketPairs(pool *p){
 					fprintf(stdout, "read client=%d\n",pair->client_fd);
 				p->nready--;
 				//todo read client
-
+				doIt_ReadClient(pair);
 			}
 
 			if(pair->server_fd>0){
@@ -196,6 +204,27 @@ void checkSocketPairs(pool *p){
 		fprintf(stdout, "check_pair done\n");
 }
 
+/*read data*/
+void doIt_ReadClient(socket_t *pair){
+	int readn;
+	pool *p=proxy_stat->p;
+	readn=clientReadByte(pair);
+
+	if(readn<0){
+		FD_CLR(pair->client_fd,&p->read_set);
+
+		if(close(pair->client_fd)<0) {
+			fprintf(stderr, "close fd error in doIt_ReadClient\n" );
+		}
+		resetSocketPair(pair);
+		return;
+	}
+
+	if(strstr(pair->buf_client->buf,"\r\n\r\n")!=NULL){
+		parseClientRequest(pair);
+	}
+
+}
 
 /**
  *	open and return a listening socket on port

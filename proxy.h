@@ -98,19 +98,23 @@ typedef struct {
 	char *dnsIP;
 	char *wwwIP;
 	pool *p;
+
+	int bitrates[4];
+	int bitrate;
+	
 }status_t;
+
 
 status_t* initProxy(int argc, char **argv);
 void initPool(pool *p);
 void initSocketPair(socket_t *pair);
-
 void setPool(int httpfd,pool *p);
 
 void addSocketPair(int connfd,pool *p,struct sockaddr_in clientaddr);
-
 void checkSocketPairs(pool *p);
 
-int open_listenfd(int port) ;
+void doIt_ReadClient(socket_t *pair);
 
+int open_listenfd(int port);
 
 #endif
