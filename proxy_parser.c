@@ -2,8 +2,9 @@
 #include "proxy_socket.h"
 #include "proxy.h"
 
-int parseClientRequest(socket_t *pair){
-	
+extern status_t *proxy_stat;
+
+int parseClientRequest(socket_t *pair){	
 
 	size_t n;
 	char buf[MAXLINE];

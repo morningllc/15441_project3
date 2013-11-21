@@ -1,6 +1,7 @@
 #include "proxy_socket.h"
 #include "proxy.h"
 
+extern status_t *proxy_stat;
 /*buffer manipulations*/
 buffer *initBuffer(){
 	buffer *b;
