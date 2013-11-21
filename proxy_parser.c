@@ -86,3 +86,31 @@ int parseMethod(socket_t *pair,char *buf){
 
 	return 0;
 }
+
+int parseServerResponse(socket_t *pair)
+{
+	do{
+		size_t n;
+		char buf[MAXLINE] = {0};
+		
+		if((n=readLine(pair->buf_server,buf,MAXLINE))==0){
+			fprintf(stderr, "bad request - zero content\n");
+			return -1;
+		}
+
+		parseLine(pair, buf);
+
+	}while(strncmp(buf,"\r\n",2)==0);
+
+	return 0;
+}
+
+int parseLine(socket_t *pair, char *buf)
+{
+	if(strstr(buf, "Content-Length")){
+		int len = 0;
+		sscanf(buf,"Content-Length: %d",&len);
+		pair->contentlen = len;
+	}
+	return 0;
+}
