@@ -20,8 +20,8 @@
 
 
  
-#define MAXLINE  8192
-#define BUFFERSIZE 1024
+#define MAXLINE  1024
+#define BUFFERSIZE 8192
 #define LISTENQ  1024
 
 #define USAGE "usage: proxy <log> <alpha> <listen-port> <fake-ip> <dns-ip> <dns-port> [<www-ip>]\n"
@@ -72,7 +72,8 @@ typedef struct{
 	
 	buffer *buf_server;
 	buffer *buf_client;
-	buffer *buf_send;
+	buffer *buf_send_client;
+	buffer *buf_send_server;
 	
 } socket_t;
 
@@ -85,7 +86,7 @@ typedef struct {
 	
 	int nready;
 	int maxi;
-	client_t clients[FD_SETSIZE];
+	socket_t pairs[FD_SETSIZE];
 } pool;
 
 typedef struct {	
@@ -100,14 +101,14 @@ typedef struct {
 }status_t;
 
 status_t* initProxy(int argc, char **argv);
-
 void initPool(pool *p);
+void initSocketPair(socket_t *pair);
 
 void setPool(int httpfd,pool *p);
 
-void addClient(int connfd,pool *p,struct sockaddr_in clientaddr);
+void addSocketPair(int connfd,pool *p,struct sockaddr_in clientaddr);
 
-void checkClients(pool *p);
+void checkSocketPairs(pool *p);
 
 int open_listenfd(int port) ;
 

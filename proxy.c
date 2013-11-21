@@ -11,14 +11,13 @@ int main(int argc, char **argv){
 	int addrlen=sizeof(struct sockaddr_in);
 	struct sockaddr_in clientaddr;
 	static pool p;	
-	int port=11223;
 
 	status_t *proxy_stat;
 	proxy_stat = initProxy(argc,argv);
 	initPool(&p);	
 	proxy_stat->p=&p;
 
-	if((listenfd=open_listenfd(port))<0){
+	if((listenfd=open_listenfd(proxy_stat->listenPort))<0){
 		fprintf(stderr, "error in open_listenfd\n");
 		return -1;
 	}
@@ -39,9 +38,9 @@ int main(int argc, char **argv){
 				fprintf(stderr, "http accept error\n");
 				continue;
 			}
-			addClient(connfd,&p,clientaddr);
+			addSocketPair(connfd,&p,clientaddr);
 		}
-		checkClients(&p);
+		checkSocketPairs(&p);
 	}
     return 0;
 }
@@ -65,14 +64,13 @@ status_t* initProxy(int argc, char **argv){
 	
 	return proxy;
 }
-
 /**
  *	initialize pool
  */
 void initPool(pool *p){
 	p->maxi=-1;
 	for(int i=0;i<FD_SETSIZE;i++){
-		//initClient(&p->clients[i]);
+		initSocketPair(&p->pairs[i]);
 	}
 	p->maxfd=-1;
 	FD_ZERO(&p->read_set);
@@ -81,7 +79,35 @@ void initPool(pool *p){
 	FD_ZERO(&p->ready_write);	
 	p->nready=0;	
 }
+/**
+ *
+ */
+ void initSocketPair(socket_t *pair){
+ 	pair->client_fd=-1;
+ 	pair->server_fd=-1;
+ 	pair->remote_addr=NULL;
+ 	
+ 	bzero(pair->host, sizeof(char)*MAXLINE);
+ 	pair->host_port=-1;
 
+ 	pair->method=-1;
+ 	pair->version=-1;
+ 	pair->request_type=-1;
+ 	bzero(pair->path, sizeof(char)*MAXLINE);
+
+ 	pair->urn=NULL;
+ 	pair->request_rate=-1;
+ 	pair->seg_num=-1;
+ 	pair->frag_num=-1;
+
+ 	pair->close=-1;
+ 	pair->contentlen=-1;
+
+ 	pair->buf_server=NULL;
+	pair->buf_client=NULL;
+	pair->buf_send_client=NULL;
+	pair->buf_send_server=NULL;
+ }
 /**
  * add two listen fds to pool
  */
@@ -90,20 +116,20 @@ void setPool(int httpfd,pool *p){
 	FD_SET(httpfd,&p->read_set);
 }
 
-void addClient(int connfd,pool *p,struct sockaddr_in clientaddr){
+void addSocketPair(int connfd,pool *p,struct sockaddr_in clientaddr){
 	if(verbal)
-		fprintf(stdout, "--->in add_client\n");
+		fprintf(stdout, "--->in add_pair\n");
 	p->nready--;
 	int i;
-	char *addr;
+	// char *addr;
 	for(i=0;i<FD_SETSIZE;i++){
-		if(p->clients[i].fd<0){
-			p->clients[i].fd=connfd;
+		if(p->pairs[i].client_fd<0){
+			p->pairs[i].client_fd=connfd;
 			FD_SET(connfd,&p->read_set);
 			
-			addr=inet_ntoa(clientaddr.sin_addr);
-			p->clients[i].remote_addr=(char *)malloc(sizeof(char)*strlen(addr));
-			strcpy(p->clients[i].remote_addr,addr);
+			// addr=inet_ntoa(clientaddr.sin_addr);
+			// p->pairs[i].remote_addr=(char *)malloc(sizeof(char)*strlen(addr));
+			// strcpy(p->pairs[i].remote_addr,addr);
 
 			if(connfd>p->maxfd)
 				p->maxfd=connfd;
@@ -114,45 +140,60 @@ void addClient(int connfd,pool *p,struct sockaddr_in clientaddr){
 	}
 	if(i==FD_SETSIZE){
 		close(connfd);
-		fprintf(stderr, "too many clients\n");
+		fprintf(stderr, "too many pairs\n");
 	}
 
 	if(verbal)
-		fprintf(stdout, "add_client done\n");
+		fprintf(stdout, "add_pair done\n");
 }
 
-void checkClients(pool *p){ 
+void checkSocketPairs(pool *p){ 
 	if(verbal)
-		fprintf(stdout, "--->in check_client\n");
+		fprintf(stdout, "--->in check_pair\n");
 	
-	client_t *client;
+	socket_t *pair;
 	
 	for(int i=0;(i<=p->maxi)&&(p->nready>0);i++){
 		
-		client=&p->clients[i];
+		pair=&p->pairs[i];
 
-		if(client->fd>0){
+		if(pair->client_fd>0){
 			
-			if(FD_ISSET(client->fd,&p->ready_write)){
+			if(FD_ISSET(pair->client_fd,&p->ready_write)){
 				p->nready--;
+				//todo send client				
 
-				//todo send 
-				
-
-				FD_CLR(client->fd,&p->write_set);
+				FD_CLR(pair->client_fd,&p->write_set);
 			}
 			
-			if(FD_ISSET(client->fd,&p->ready_read)){
+			if(FD_ISSET(pair->client_fd,&p->ready_read)){
 				if(verbal)
-					fprintf(stdout, "read connfd=%d\n",client->fd );
+					fprintf(stdout, "read client=%d\n",pair->client_fd);
 				p->nready--;
-				//todo read
+				//todo read client
 
+			}
+
+			if(pair->server_fd>0){
+				if(FD_ISSET(pair->server_fd,&p->ready_write)){
+					p->nready--;
+					//todo send server				
+
+					FD_CLR(pair->server_fd,&p->write_set);
+				}
+				
+				if(FD_ISSET(pair->server_fd,&p->ready_read)){
+					if(verbal)
+						fprintf(stdout, "read server=%d\n",pair->server_fd);
+					p->nready--;
+					//todo read server
+
+				}
 			}
 		}
 	}
 	if(verbal)
-		fprintf(stdout, "check_client done\n");
+		fprintf(stdout, "check_pair done\n");
 }
 
 
