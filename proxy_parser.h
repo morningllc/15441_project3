@@ -2,7 +2,6 @@
 #define _PROXY_PASER_H_
 
 #include "proxy.h"
-#include "proxy_socket.h"
 
 
 #define METHOD_GET      1

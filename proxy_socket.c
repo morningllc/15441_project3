@@ -71,7 +71,7 @@ void initSocketPair(socket_t *pair){
  	pair->host_port=-1;
 
  	pair->method=-1;
- 	pair->version=-1;
+ 	bzero(pair->version, sizeof(char)*MAXLINE);
  	pair->request_type=-1;
  	bzero(pair->path, sizeof(char)*MAXLINE);
 

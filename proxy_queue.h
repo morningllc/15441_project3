@@ -6,7 +6,7 @@
 
 typedef struct node
 {
-  void *data;
+  int data;
   struct node *prev;
   struct node *next;
 }node_t;
@@ -20,9 +20,9 @@ typedef struct queue
 
 queue_t *new_queue(void);
 
-void enqueue(queue_t *queue, void *data);
+void enqueue(queue_t *queue, int data);
 
-void *dequeue(queue_t *queue);
+int dequeue(queue_t *queue);
 
 void free_queue(queue_t *queue);
 

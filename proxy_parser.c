@@ -19,15 +19,16 @@ int parseClientRequest(socket_t *pair){
 	return 0;
 }
 
+
 int parseMethod(socket_t *pair,char *buf){
-	char method[MAXLINE],uri[MAXLINE],version[MAXLINE];
+	char method[MAXLINE],uri[MAXLINE];
 	char protocol[MAXLINE],host[MAXLINE],path[MAXLINE];
 
 	if(strstr(buf,"/")==NULL){
 		fprintf(stderr, "bad request - without '/' \n");
 		return -1;
 	}
-	sscanf(buf,"%s %s %s",method,uri,version);
+	sscanf(buf,"%s %s %s",method,uri,pair->version);
 
 	/*parse method*/
 	if(!strcmp(method,"GET"))
@@ -40,14 +41,14 @@ int parseMethod(socket_t *pair,char *buf){
 		pair->method = METHOD_BAD;
 	}
 
-	/*parse version*/
-	if(!strcmp(version,"HTTP/1.1"))
-		pair->version = HTTP_1_1;
-	if(!strcmp(version,"HTTP/1.0"))
-		pair->version = HTTP_1_0;
-	else{		
-		pair->version = HTTP_BAD;
-	}
+	// /*parse version*/
+	// if(!strcmp(version,"HTTP/1.1"))
+	// 	pair->version = HTTP_1_1;
+	// if(!strcmp(version,"HTTP/1.0"))
+	// 	pair->version = HTTP_1_0;
+	// else{		
+	// 	pair->version = HTTP_BAD;
+	// }
 
 	/*parse uri*/
 	if(strstr(uri,"://")!=NULL){

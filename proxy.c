@@ -222,7 +222,7 @@ void doIt_ReadClient(socket_t *pair){
 
 	if(strstr(pair->buf_client->buf,"\r\n\r\n")!=NULL){
 		parseClientRequest(pair);
-		doIt_Process(socket_t *pair);
+		doIt_Process(pair);
 	}
 
 }
