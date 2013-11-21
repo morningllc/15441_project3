@@ -54,7 +54,11 @@ typedef struct{
 	int frag_num;
 
 	int close;
+	
+	int recv;
+	int left;
 	int contentlen;
+	char *content_buf;
 
 	queue_t *requestQueue;
 	buffer *buf_server;

@@ -129,6 +129,36 @@ int clientReadByte(socket_t *pair){
 	return -1;
 }
 
+int serverReadByte(socket_t *pair)
+{
+  int fd = pair->server_fd;
+	char *buf = pair->buf_server->buf + pair->buf_server->length;
+
+  if((ssize_t n=recv(fd,buf,1,NULL))<=0){
+		return -1;
+	}
+
+	pair->buf_server->length+=n;
+
+  return 0;
+}
+
+int serverReadContent(socket_t *pair)
+{
+  int fd = pair->server_fd;
+  char *buf = pair->content_buf + pair->recv;
+	int len = pair->left;
+
+	if((ssize_t n = recv(fd, buf, len, NULL)) <= 0){
+		return -1;
+	}
+
+	pair->recv+=n;
+  pair->left-=n;
+
+  return 0;
+}
+
 
 ssize_t readLine(buffer* src,char *usrbuf, ssize_t maxlen){
 	ssize_t n;
