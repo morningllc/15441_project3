@@ -144,7 +144,7 @@ void checkSocketPairs(pool *p){
 			if(FD_ISSET(pair->client_fd,&p->ready_write)){
 				p->nready--;
 				//todo send client				
-
+				doIt_SendToClient(pair);
 				FD_CLR(pair->client_fd,&p->write_set);
 			}
 			
@@ -160,7 +160,7 @@ void checkSocketPairs(pool *p){
 				if(FD_ISSET(pair->server_fd,&p->ready_write)){
 					p->nready--;
 					//todo send server				
-
+					doIt_SendToServer(pair);
 					FD_CLR(pair->server_fd,&p->write_set);
 				}
 				
@@ -261,6 +261,43 @@ void doIt_Process(socket_t *pair)
 		FD_SET(pair->server_fd, &proxy_stat->p->write_set);
 	}
 }
+
+void doIt_SendToServer(socket_t *pair){
+	fprintf(stdout, "--->in send to server\n");
+	pool *p=proxy_stat->p;
+	ssize_t n;
+	if((n=send(pair->server_fd,pair->buf_send_server->buf,pair->buf_send_server->length,0))
+		!=pair->buf_send_server->length){
+
+		fprintf(stderr, "error in send \n");
+
+		FD_CLR(pair->server_fd,&p->write_set);
+		return;
+	}
+	FD_CLR(pair->server_fd,&p->write_set);
+
+	resetBuffer(pair->buf_send_server);
+	fprintf(stdout, "--->send server done\n");	
+}
+
+void doIt_SendToClient(socket_t *pair){
+	fprintf(stdout, "--->in send to client\n");
+	pool *p=proxy_stat->p;
+	ssize_t n;
+	if((n=send(pair->client_fd,pair->buf_send_server->buf,pair->buf_send_server->length,0))
+		!=pair->buf_send_server->length){
+
+		fprintf(stderr, "error in send \n");
+
+		FD_CLR(pair->client_fd,&p->write_set);
+		return;
+	}
+	FD_CLR(pair->client_fd,&p->write_set);
+
+	resetBuffer(pair->buf_send_server);
+	fprintf(stdout, "--->send client done \n");	
+}
+
 
 /**
  *	open and return a listening socket on port

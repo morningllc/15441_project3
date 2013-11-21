@@ -112,7 +112,10 @@ void addSocketPair(int connfd,pool *p,struct sockaddr_in clientaddr);
 void checkSocketPairs(pool *p);
 
 void doIt_ReadClient(socket_t *pair);
+void doIt_ReadServer(socket_t *pair);
 void doIt_Process(socket_t *pair);
+void doIt_SendToServer(socket_t *pair);
+void doIt_SendToClient(socket_t *pair);
 int open_listenfd(int port);
 
 #endif
