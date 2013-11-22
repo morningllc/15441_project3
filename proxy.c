@@ -69,7 +69,7 @@ status_t* initProxy(int argc, char **argv){
 		proxy->wwwIP = NULL;
 	
 	bzero(proxy->bitrates,sizeof(int)*4);
-	proxy->bitrate=0;
+	proxy->bitrate=10;
 
 	return proxy;
 }
@@ -260,7 +260,9 @@ void doIt_ReadServer(socket_t *pair)
 			addData(pair->buf_send_client, pair->buf_server->buf, pair->buf_server->length);
 			if(verbal) fprintf(stdout, "-->buf_server....cfd=%d ---\n",pair->client_fd);
 			checkBuffer(pair->buf_server,"buf_server");
-			pair->server_stat = CONTENT;
+			if(pair->contentlen > 0){
+				pair->server_stat = CONTENT;
+			}
 			resetBuffer(pair->buf_server);
 		}
 	}
@@ -322,8 +324,8 @@ void doIt_Process(socket_t *pair)
 		fprintf(stdout, "open_serverfd done cfd=%d\n",pair->client_fd);
 		if(pair->server_fd > proxy_stat->p->maxfd){
 			proxy_stat->p->maxfd = pair->server_fd;
-			FD_SET(pair->server_fd, &proxy_stat->p->read_set);
 		}
+		FD_SET(pair->server_fd, &proxy_stat->p->read_set);
 	}
 	if(buildRequestContent(pair)>=0){
 		// FD_SET(pair->client_fd, &proxy_stat->p->write_set);
