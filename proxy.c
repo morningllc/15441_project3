@@ -37,6 +37,7 @@ int main(int argc, char **argv){
 		}		
 			
 		if(FD_ISSET(listenfd,&p.ready_read)){
+			printf("--------------browser connecting-----------------\n");
 			if((connfd=accept(listenfd,(SA *)&clientaddr,(socklen_t *) &addrlen))<0){
 				fprintf(stderr, "http accept error\n");
 				continue;
