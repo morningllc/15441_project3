@@ -5,41 +5,50 @@
 extern status_t *proxy_stat;
 
 int buildRequestContent(socket_t *pair){
-	 char request[BUFFERSIZE];
-	 char header[BUFFERSIZE];
-
+	 char request[BUFFERSIZE]={0};
+	 char header[BUFFERSIZE]={0};
+	 // fprintf(stdout, "header-1:\n\n%s\n\n\n",header);
 	 buildRequestHeader(pair, header);
-
+	// fprintf(stdout, "header-2:\n\n%s\n\n\n",header);
 	 strcpy(request,"GET");
 	 strcat(request," ");
 	 switch(pair->request_type){
 	 	case TYPE_MANIFEST:
-	 		pair->urn=0;
+	 		fprintf(stdout, "%p\n",pair->urn);
+	 		*(pair->urn)=0;
+	 		fprintf(stdout, "%p---%c\n",pair->urn,*(pair->urn));
 	 		return buildManifestContent(pair,header);
 	 	case TYPE_VIDEO:
-	 		pair->urn=0;
+	 		*(pair->urn)=0;
 	 		sprintf(pair->path,"%s%dSeg%d-Frag%d ",pair->path,
 	 			proxy_stat->bitrate,pair->seg_num,pair->frag_num);
 	 		break;
 	 	default:
 	 		break;
 	 }	
-
+	 // fprintf(stdout, "request-1:\n\n%s\n\n\n",request);
 	 strcat(request,pair->path);
 	 strcat(request," ");
+	 // fprintf(stdout, "request-2:\n\n%s\n\n\n",request);
 	 strcat(request,pair->version);
+	 // fprintf(stdout, "request-3:\n\n%s\n\n\n",request);
 	 if(strstr(request,"\r\n")==NULL)
 	 	strcat(request,"\r\n");
+	 // fprintf(stdout, "request-4:\n\n%s\n\n\n",request);
 	 strcat(request,header);
 
+	 // fprintf(stdout, "request-5:\n\n%s\n\n\n",request);
 
 	 if(addData(pair->buf_send_server,(void *)request,strlen(request)))
 	 	return -1;
+	 // if(addData(pair->buf_send_server,pair->buf_client->buf,pair->buf_client->length))
+	 // 	return -1;
 	 enqueue(pair->requestQueue,pair->request_type);
 	 pair->time = time(NULL);
 	 return 0;
 }
 int buildManifestContent(socket_t *pair,char *header){
+
 	char request[BUFFERSIZE];
 	char request_nolist[BUFFERSIZE];
 
@@ -53,12 +62,18 @@ int buildManifestContent(socket_t *pair,char *header){
 	 	strcat(request_nolist,"\r\n");
 	strcat(request_nolist,header);
 
+	// fprintf(stdout, "header:\n\n%s\n\n\n",header);
+	// fprintf(stdout, "request-list:\n\n%s\n\n\n",request);
+	// fprintf(stdout, "request-nolist:\n\n%s\n\n\n",request_nolist);
+
+
+
 	if(addData(pair->buf_send_server,(void *)request,strlen(request))){
 		fprintf(stderr, "add data error - add manifest data\n");
 	 	return -1;
 	 }
 	 enqueue(pair->requestQueue,TYPE_MANIFEST);
-	 if(addData(pair->buf_send_server,(void *)request_nolist,strlen(request))){
+	 if(addData(pair->buf_send_server,(void *)request_nolist,strlen(request_nolist))){
 	 	fprintf(stderr, "add data error - add nolist manifest data\n");
 	 	return -1;
 	 }
@@ -92,7 +107,7 @@ int open_serverfd(socket_t *pair)
   char *server_ip = proxy_stat->wwwIP;
   char server_port[] = "8080";
   char *fake_ip = proxy_stat->fakeIP;
-  unsigned short rand_port = 55443;
+  unsigned short rand_port = rand()%100000;
 
 	fprintf(stdout, "fake:%s\nwww:%s\n",proxy_stat->fakeIP, proxy_stat->wwwIP);
 

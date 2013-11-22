@@ -101,8 +101,13 @@ void resetSocketPair(socket_t *s){
 		s->requestQueue=NULL;
 	}
 	cleanSocketBuffer(s);
+	if(s->server_fd>0){
+		close(s->server_fd);
+		FD_CLR(s->server_fd,&proxy_stat->p->write_set);
+		FD_CLR(s->server_fd,&proxy_stat->p->read_set);
+	}
 	initSocketPair(s);
-	//fprintf(stdout, "==>in resetClient ret=%d\n",ret);
+	//fprintf(stdout, "==>in resetClient cfd=%d\n",s->client_fd);
 }
 /*END*/
 
@@ -141,12 +146,12 @@ int serverReadByte(socket_t *pair)
 
 	ssize_t n;
   if((n=recv(fd,buf,1,MSG_DONTWAIT))<=0){
-		return -1;
+		return n;
 	}
 
 	pair->buf_server->length+=n;
 
-  return 0;
+  return n;
 }
 
 int serverReadContent(socket_t *pair)
@@ -157,13 +162,13 @@ int serverReadContent(socket_t *pair)
 
 	ssize_t n;
 	if((n = recv(fd, buf, len, MSG_DONTWAIT)) <= 0){
-		return -1;
+		return n;
 	}
 
 	pair->recv+=n;
   pair->left-=n;
 
-  return 0;
+  return n;
 }
 
 

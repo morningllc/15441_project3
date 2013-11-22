@@ -21,7 +21,10 @@ int parseClientRequest(socket_t *pair){
 		return -1;
 	}
 
-	parseMethod(pair,buf);
+	if(parseMethod(pair,buf)<0){
+		fprintf(stderr, "error parse header!!!!!!!!!!!\n");
+		return -1;
+	}
 
 	return 0;
 }
@@ -78,14 +81,18 @@ int parseMethod(socket_t *pair,char *buf){
 	}
 
 	strcpy(pair->path,path);
-	char *urn=strrchr(pair->path,'/');
-	if(urn!=NULL) urn++;
+	pair->urn=strrchr(pair->path,'/');
+	if(pair->urn==NULL) {
+		fprintf(stderr, "urn===============null\n");
+	}
+	else
+		pair->urn++;
 	int bitrate,seg,frag;
 
-	if(strstr(urn,".f4m")){
+	if(strstr(pair->urn,".f4m")){
 		pair->request_type = TYPE_MANIFEST;
-	}else if((strchr(urn,'.')==NULL)&&(sscanf(urn,"%dSeg%d-Frag%d",&bitrate,&seg,&frag)!=0)){
-		pair->urn=urn;
+	}else if((strchr(pair->urn,'.')==NULL)&&(sscanf(pair->urn,"%dSeg%d-Frag%d",&bitrate,&seg,&frag)!=0)){
+		// pair->urn=urn;
 		pair->request_rate=bitrate;
 		pair->seg_num=seg;
 		pair->frag_num=frag;
@@ -138,7 +145,7 @@ int parseManifestFile(char *buf)
   sscanf(ptr, "bitrate=\"%d\"",&bitrate);
   proxy_stat->bitrates[3] = bitrate;
 
-	proxy_stat->bitrate = proxy_stat->bitrates[0];
+	proxy_stat->bitrate = proxy_stat->bitrates[2];
 
 	return 0;
 }
