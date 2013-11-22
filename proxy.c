@@ -212,7 +212,7 @@ void updateBitRate()
 
 void doIt_ReadServer(socket_t *pair)
 {
-	fprintf(stdout, "-----------------doIt_ReadClient---------------\n");
+	fprintf(stdout, "-----------------doIt_ReadServer---------------\n");
 	int readn;
 	if(pair->server_stat == HEADER){
 		readn = serverReadByte(pair);
