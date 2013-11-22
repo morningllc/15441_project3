@@ -77,6 +77,9 @@ int buildRequestHeader(socket_t *pair, char* header){
 		else if(!strncasecmp(tmpbuf,"Connection: close",strlen("Connection: close"))){
 			pair->close=1;
 			strcat(header,tmpbuf);
+		}else if(!strncasecmp(tmpbuf,"Host: ",strlen("Host: "))){
+			strcpy(pair->host,tmpbuf+strlen("Host: "));
+			strcat(header,tmpbuf);
 		}else
 			strcat(header,tmpbuf);
 	}
@@ -89,32 +92,39 @@ int open_serverfd(socket_t *pair)
   char *server_ip = proxy_stat->wwwIP;
   char server_port[] = "8080";
   char *fake_ip = proxy_stat->fakeIP;
-	char rand_port[] = "5555";
+  unsigned short rand_port = 5555;
+
+	fprintf(stdout, "fake:%s\nwww:%s\n",proxy_stat->fakeIP, proxy_stat->wwwIP);
 
 	int status, sock;
   struct addrinfo hints;
   memset(&hints, 0, sizeof(struct addrinfo));
-  struct addrinfo *servinfo, *addr;
+  struct addrinfo *servinfo;
+  struct sockaddr_in addr;
   hints.ai_family = AF_UNSPEC;
   hints.ai_socktype = SOCK_STREAM;
   hints.ai_flags = AI_PASSIVE;
+
+  addr.sin_family=AF_INET;
+  addr.sin_addr.s_addr = inet_addr(fake_ip);
+  addr.sin_port=htons(rand_port);
 
   if((status = getaddrinfo(server_ip, server_port, &hints, &servinfo)) != 0){
 		fprintf(stderr, "getaddrinfo error\n");
 		return -1;
 	}
 
-  if((status = getaddrinfo(fake_ip, rand_port, NULL, &addr)) != 0){
-		fprintf(stderr, "getaddrinfo error\n");
-    return -1;
-	}
+ //  if((status = getaddrinfo(fake_ip, rand_port, &hints, &addr)) != 0){
+	// 	fprintf(stderr, "getaddrinfo error\n");
+ //    return -1;
+	// }
 
 	if((sock = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol)) == -1){
 		fprintf(stderr, "Socket failed\n");
 		return -1;
 	}
 
-	if(bind(sock, (struct sockaddr *)addr, sizeof(*addr))){
+	if(bind(sock, (struct sockaddr *)&addr, sizeof(addr))){
 		fprintf(stderr, "Failed binding socket\n");
 		return -1;
 	}
@@ -125,7 +135,7 @@ int open_serverfd(socket_t *pair)
 	}
 
 	freeaddrinfo(servinfo);
-	freeaddrinfo(addr);
+	// freeaddrinfo(addr);
 
   pair->server_fd = sock;
 
