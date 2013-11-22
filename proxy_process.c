@@ -92,7 +92,7 @@ int open_serverfd(socket_t *pair)
   char *server_ip = proxy_stat->wwwIP;
   char server_port[] = "8080";
   char *fake_ip = proxy_stat->fakeIP;
-  unsigned short rand_port = 5555;
+  unsigned short rand_port = 55443;
 
 	fprintf(stdout, "fake:%s\nwww:%s\n",proxy_stat->fakeIP, proxy_stat->wwwIP);
 
