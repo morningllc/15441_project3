@@ -7,6 +7,7 @@ extern status_t *proxy_stat;
 int buildRequestContent(socket_t *pair){
 	 char request[BUFFERSIZE]={0};
 	 char header[BUFFERSIZE]={0};
+	 // char request_name[MAXLINE]={0};
 
 	 buildRequestHeader(pair, header);
 	 
@@ -41,6 +42,7 @@ int buildRequestContent(socket_t *pair){
 	 pstate_t *label = (pstate_t *)malloc(sizeof(pstate_t));
 	 label->request_type=pair->request_type;
 	 label->send_time=time(NULL);
+	 strcpy(label->chunk_name,pair->path);
 	 enqueue(pair->requestQueue,(void*)label);
 	 
 	 return 0;
@@ -67,6 +69,8 @@ int buildManifestContent(socket_t *pair,char *header){
 	 pstate_t *label_list = (pstate_t *)malloc(sizeof(pstate_t));
 	 label_list->request_type=TYPE_MANIFEST;
 	 label_list->send_time=time(NULL);
+	 strcpy(label_list->chunk_name,pair->path);
+	 strcat(label_list->chunk_name,"big_buck_bunny.f4m");
 	 enqueue(pair->requestQueue,(void *)label_list);
 	 
 
@@ -76,7 +80,9 @@ int buildManifestContent(socket_t *pair,char *header){
 	 }
 	 pstate_t *label_nolist = (pstate_t *)malloc(sizeof(pstate_t));
 	 label_nolist->request_type=TYPE_OTHER;
-	 label_nolist->send_time=time(NULL);	 
+	 label_nolist->send_time=time(NULL);
+	 strcpy(label_nolist->chunk_name,pair->path);
+	 strcat(label_nolist->chunk_name,"sbig_buck_bunny_nolist.f4m");	 
 	 enqueue(pair->requestQueue,(void *)label_nolist);
 
 	 return 0;

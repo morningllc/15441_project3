@@ -1,8 +1,8 @@
 /****************************************
  * Name: Lingchen Li ID:lli
  ****************************************/
-#ifndef _LISO_LOG_H_
-#define _LISO_LOG_H_
+#ifndef _PROXY_LOG_H_
+#define _PROXY_LOG_H_
 
 #include <time.h>
 #include <stdio.h>
@@ -12,6 +12,6 @@
 
 void createLogFile(char *filename);
 void closeLogFile() ;
-void logWrite(char* file,char* function,char* message,...);
+void logWrite(float duration, float tput,float avg_tput, int bitrate, char *client_ip,char *chunkname);
 
 #endif

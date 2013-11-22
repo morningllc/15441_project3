@@ -27,31 +27,12 @@ void closeLogFile() {
 		}
 }
 
-// /**
-//  * do log
-//  */
-// void logWrite(char* file,char* function,char* message,...){
-// 	if(logFile!=NULL){
-// 		va_list ap;
-// 		va_start(ap,message);
 
-// 		time_t timetmp=time(NULL);
-
-// 		char timeStr[80];
-// 		strftime(timeStr,sizeof(timeStr),"%x %X",localtime(&timetmp));
-// 		fprintf(logFile,"\ntime:%s +> ",timeStr);
-// 		vfprintf(logFile,message,ap);
-// 		fprintf(logFile,"\n                           in -> %s::%s\n",function,file);
-
-// 	}else
-// 		fprintf(stderr, "Error:log file is not opened\n");
-// }
-
-void logWrite(float duration, float tput,float avg-tput, int bitrate, char *client-ip,char *chunkname){
+void logWrite(float duration, float tput,float avg_tput, int bitrate, char *client_ip,char *chunkname){
 	if(logFile!=NULL){
 		time_t timetmp=time(NULL);
 
-		fprintf(logFile, "%d %.2f %.2f %.2f %d %s %s\n",(int)timetmp,duration,tput,avg-tput,bitrate,client-ip,chunkname );
+		fprintf(logFile, "%d %.2f %.2f %.2f %d %s %s\n",(int)timetmp,duration,tput,avg_tput,bitrate,client_ip,chunkname );
 	}else
 		fprintf(stderr, "Error:log file is not opened\n");
 }

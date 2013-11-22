@@ -6,10 +6,11 @@
 #include "proxy_socket.h"
 #include "proxy_process.h"
 #include "proxy_bitrate.h"
+#include "proxy_log.h"
 
 int verbal = 1;
 status_t *proxy_stat;
-int tmpppppp=0;
+
 int main(int argc, char **argv){
 	int listenfd,connfd;
 	int addrlen=sizeof(struct sockaddr_in);
@@ -17,10 +18,11 @@ int main(int argc, char **argv){
 	static pool p;	
 	srand(time(NULL));
 	//signal(SIGPIPE,SIG_IGN); 
+	signal(SIGINT,closeProxy);
 	proxy_stat = initProxy(argc,argv);
 	initPool(&p);	
 	proxy_stat->p=&p;
-
+	createLogFile(proxy_stat->logFile);
 	if((listenfd=open_listenfd(proxy_stat->listenPort))<0){
 		fprintf(stderr, "error in open_listenfd\n");
 		return -1;
@@ -105,15 +107,15 @@ void addSocketPair(int connfd,pool *p,struct sockaddr_in clientaddr){
 		fprintf(stdout, "--->in add_pair\n");
 	p->nready--;
 	int i;
-	// char *addr;
+	char *addr;
 	for(i=0;i<FD_SETSIZE;i++){
 		if(p->pairs[i].client_fd<0){
 			p->pairs[i].client_fd=connfd;
 			FD_SET(connfd,&p->read_set);
 			
-			// addr=inet_ntoa(clientaddr.sin_addr);
-			// p->pairs[i].remote_addr=(char *)malloc(sizeof(char)*strlen(addr));
-			// strcpy(p->pairs[i].remote_addr,addr);
+			addr=inet_ntoa(clientaddr.sin_addr);
+			p->pairs[i].remote_addr=(char *)malloc(sizeof(char)*strlen(addr));
+			strcpy(p->pairs[i].remote_addr,addr);
 
 			initSocketBuffer(&p->pairs[i]);
 
@@ -411,4 +413,8 @@ int open_listenfd(int port)
     	return -1;
     }
     return listenfd;
+}
+void closeProxy(){
+    closeLogFile();
+    exit(0);
 }

@@ -106,6 +106,7 @@ typedef struct {
 typedef struct {
 	int request_type;
 	time_t send_time;
+	char chunk_name[MAXLINE];
 }pstate_t;
 
 
@@ -123,5 +124,5 @@ void doIt_Process(socket_t *pair);
 void doIt_SendToServer(socket_t *pair);
 void doIt_SendToClient(socket_t *pair);
 int open_listenfd(int port);
-
+void closeProxy();
 #endif
