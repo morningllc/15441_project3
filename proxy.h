@@ -59,8 +59,7 @@ typedef struct{
 	int frag_num;
 
 	int close;
-
-	time_t time;	
+	
 	int recv;
 	int left;
 	int contentlen;
@@ -102,6 +101,11 @@ typedef struct {
 	int bitrate;
 	
 }status_t;
+
+typedef struct {
+	int request_type;
+	time_t send_time;
+}pstate_t;
 
 
 status_t* initProxy(int argc, char **argv);

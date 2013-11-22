@@ -7,9 +7,9 @@ extern status_t *proxy_stat;
 int buildRequestContent(socket_t *pair){
 	 char request[BUFFERSIZE]={0};
 	 char header[BUFFERSIZE]={0};
-	 // fprintf(stdout, "header-1:\n\n%s\n\n\n",header);
+
 	 buildRequestHeader(pair, header);
-	// fprintf(stdout, "header-2:\n\n%s\n\n\n",header);
+	 
 	 strcpy(request,"GET");
 	 strcat(request," ");
 	 switch(pair->request_type){
@@ -26,24 +26,23 @@ int buildRequestContent(socket_t *pair){
 	 	default:
 	 		break;
 	 }	
-	 // fprintf(stdout, "request-1:\n\n%s\n\n\n",request);
+	 
 	 strcat(request,pair->path);
 	 strcat(request," ");
-	 // fprintf(stdout, "request-2:\n\n%s\n\n\n",request);
 	 strcat(request,pair->version);
-	 // fprintf(stdout, "request-3:\n\n%s\n\n\n",request);
 	 if(strstr(request,"\r\n")==NULL)
 	 	strcat(request,"\r\n");
-	 // fprintf(stdout, "request-4:\n\n%s\n\n\n",request);
 	 strcat(request,header);
 
-	 // fprintf(stdout, "request-5:\n\n%s\n\n\n",request);
 
 	 if(addData(pair->buf_send_server,(void *)request,strlen(request)))
-	 	return -1;
-	 // if(addData(pair->buf_send_server,pair->buf_client->buf,pair->buf_client->length))
-	 // 	return -1;
-	 enqueue(pair->requestQueue,pair->request_type);
+	 	return -1;	 
+	 
+	 pstate_t *label = (pstate_t *)malloc(sizeof(pstate_t));
+	 label->request_type=pair->request_type;
+	 label->send_time=time(NULL);
+	 enqueue(pair->requestQueue,(void*)label);
+	 
 	 pair->time = time(NULL);
 	 return 0;
 }
@@ -62,22 +61,24 @@ int buildManifestContent(socket_t *pair,char *header){
 	 	strcat(request_nolist,"\r\n");
 	strcat(request_nolist,header);
 
-	// fprintf(stdout, "header:\n\n%s\n\n\n",header);
-	// fprintf(stdout, "request-list:\n\n%s\n\n\n",request);
-	// fprintf(stdout, "request-nolist:\n\n%s\n\n\n",request_nolist);
-
-
-
 	if(addData(pair->buf_send_server,(void *)request,strlen(request))){
 		fprintf(stderr, "add data error - add manifest data\n");
 	 	return -1;
 	 }
-	 enqueue(pair->requestQueue,TYPE_MANIFEST);
+	 pstate_t *label_list = (pstate_t *)malloc(sizeof(pstate_t));
+	 label_list->request_type=TYPE_MANIFEST;
+	 label_list->send_time=time(NULL);
+	 enqueue(pair->requestQueue,(void *)label_list);
+	 
+
 	 if(addData(pair->buf_send_server,(void *)request_nolist,strlen(request_nolist))){
 	 	fprintf(stderr, "add data error - add nolist manifest data\n");
 	 	return -1;
 	 }
-	 enqueue(pair->requestQueue,TYPE_OTHER);
+	 pstate_t *label_nolist = (pstate_t *)malloc(sizeof(pstate_t));
+	 label_nolist->request_type=TYPE_OTHER;
+	 label_nolist->send_time=time(NULL);	 
+	 enqueue(pair->requestQueue,(void *)label_nolist);
 
 	 return 0;
 }

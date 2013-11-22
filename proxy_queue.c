@@ -15,55 +15,61 @@ queue_t *new_queue()
 /**
  * add new data into queue
  */
-void enqueue(queue_t *queue, int type)
+void enqueue(queue_t *queue, void *data)
 {
-    assert(queue != NULL);
-    fprintf(stdout, "****************enqueue : %d*****************\n",type );
-    node_t *node = malloc(sizeof(node_t));
-    node->data = type;
-    node->prev = NULL;
-    node->next = NULL;
+  assert(queue != NULL);
+  assert(data != NULL);
 
-    if(queue->tail != NULL){
-      	queue->tail->next = node;
-      	node->prev = queue->tail;
-      	queue->tail = node;
-    }
-    else{
-    	  queue->head = queue->tail = node;
-    }
+  node_t *node = malloc(sizeof(node_t));
+  node->data = data;
+  node->prev = NULL;
+  node->next = NULL;
 
-    queue->size++;
-    return;
+  if(queue->tail != NULL){
+    queue->tail->next = node;
+  node->prev = queue->tail;
+  queue->tail = node;
+  }
+  else{
+    queue->head = queue->tail = node;
+  }
+  queue->size++;
+  return;
 }
 
 /**
  * pop out an element
  */
-int dequeue(queue_t *queue)
+void *dequeue(queue_t *queue)
 {
+  assert(queue != NULL);
 
-    assert(queue != NULL);
-    assert(queue->size!=0);
-    node_t *head = queue->head;
- 
-  	int ret = head->data;
-  	node_t *next = head->next;
+  node_t *head = queue->head;
+  if(queue->size == 0){
+  assert(queue->head == NULL);
+  assert(queue->tail == NULL);
+    return NULL;    
+  }
+  else{
+  void *data = head->data;
+  node_t *next = head->next;
     if(next != NULL){
-    	  next->prev = NULL;
-    	  queue->head = next;
-  	}else{
-  	    queue->head = queue->tail = NULL;
-  	}
-  	free(head);
-  	queue->size--;
-    fprintf(stdout, "****************dequeue : %d*****************\n",ret );
-  	return ret;
+    next->prev = NULL;
+    queue->head = next;
+  } 
+  else{
+    queue->head = queue->tail = NULL;
+  }
+  free(head);
+  queue->size--;
+  return data;
+  } 
 }
 
 void free_queue(queue_t *queue)
 {
-  while(queue->size != 0)
+  while(queue->size != 0){
     dequeue(queue);
+  }
   free(queue);
 }
