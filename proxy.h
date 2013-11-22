@@ -99,6 +99,7 @@ typedef struct {
 
 	int bitrates[4];
 	int bitrate;
+	float t;
 	
 }status_t;
 

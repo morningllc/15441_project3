@@ -43,7 +43,6 @@ int buildRequestContent(socket_t *pair){
 	 label->send_time=time(NULL);
 	 enqueue(pair->requestQueue,(void*)label);
 	 
-	 pair->time = time(NULL);
 	 return 0;
 }
 int buildManifestContent(socket_t *pair,char *header){

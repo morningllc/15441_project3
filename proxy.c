@@ -5,6 +5,7 @@
 #include "proxy_parser.h"
 #include "proxy_socket.h"
 #include "proxy_process.h"
+#include "proxy_bitrate.h"
 
 int verbal = 1;
 status_t *proxy_stat;
@@ -70,6 +71,7 @@ status_t* initProxy(int argc, char **argv){
 	
 	bzero(proxy->bitrates,sizeof(int)*4);
 	proxy->bitrate=10;
+	proxy->t = 10.0;
 
 	return proxy;
 }
@@ -286,13 +288,13 @@ void doIt_ReadServer(socket_t *pair)
 		}
 
 		if(pair->left == 0 && pair->recv == pair->contentlen){
-			int type = dequeue(pair->requestQueue);
-			if(type == TYPE_MANIFEST){
+			pstate_t *req = dequeue(pair->requestQueue);
+			if(req->request_type == TYPE_MANIFEST){
 				parseManifestFile(pair->content_buf);
 				addData(pair->buf_send_client, pair->content_buf, pair->contentlen);
 			}
-			else if(type == TYPE_VIDEO){
-				updateBitRate();
+			else if(req->request_type == TYPE_VIDEO){
+				update_bitrate(req->send_time, time(NULL), pair->contentlen);
 				addData(pair->buf_send_client, pair->content_buf, pair->contentlen);
 			}
 			else{

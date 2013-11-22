@@ -145,7 +145,8 @@ int parseManifestFile(char *buf)
   sscanf(ptr, "bitrate=\"%d\"",&bitrate);
   proxy_stat->bitrates[3] = bitrate;
 
-	proxy_stat->bitrate = proxy_stat->bitrates[2];
+	proxy_stat->bitrate = proxy_stat->bitrates[0];
+	proxy_stat->t = (float)proxy_stat->bitrates[0];
 
 	return 0;
 }
