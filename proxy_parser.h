@@ -18,7 +18,7 @@
 #define TYPE_OTHER      3
 
 
-
+void checkBuffer(buffer *b,char *name);
 int parseClientRequest(socket_t *pair);
 int parseMethod(socket_t *pair,char *buf);
 

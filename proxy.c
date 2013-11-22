@@ -214,19 +214,25 @@ void doIt_ReadServer(socket_t *pair)
 {
 	fprintf(stdout, "-----------------doIt_ReadServer---------------\n");
 	int readn;
+
 	if(pair->server_stat == HEADER){
 		readn = serverReadByte(pair);
+
+		fprintf(stdout, "header readn=%d\n", readn);
     if(readn < 0){
 		}
 		
 		if(strstr(pair->buf_server->buf, "\r\n\r\n") != NULL){
 			parseServerHeader(pair);
 			addData(pair->buf_send_client, pair->buf_server->buf, pair->buf_server->length);
+			checkBuffer(pair->buf_server,"buf_server");
 			pair->server_stat = CONTENT;
 		}
 	}
 	else{
 		readn = serverReadContent(pair);
+
+		fprintf(stdout, "content readn=%d\n", readn);
 		if(readn < 0){
 		}
 
@@ -294,15 +300,15 @@ void doIt_SendToServer(socket_t *pair){
 
 	resetBuffer(pair->buf_send_server);
 	
-	fprintf(stdout, "-----------------doIt_SendToServer done---------------\n\n");	
+	fprintf(stdout, "-----------------doIt_SendToServer done : %d---------------\n\n",(int)n);	
 }
 
 void doIt_SendToClient(socket_t *pair){
 	fprintf(stdout, "-----------------doIt_SendToClient---------------\n\n");
 	pool *p=proxy_stat->p;
 	ssize_t n;
-	if((n=send(pair->client_fd,pair->buf_send_server->buf,pair->buf_send_server->length,0))
-		!=pair->buf_send_server->length){
+	if((n=send(pair->client_fd,pair->buf_send_client->buf,pair->buf_send_client->length,0))
+		!=pair->buf_send_client->length){
 
 		fprintf(stderr, "error in send \n");
 
@@ -311,8 +317,8 @@ void doIt_SendToClient(socket_t *pair){
 	}
 	FD_CLR(pair->client_fd,&p->write_set);
 
-	resetBuffer(pair->buf_send_server);
-	fprintf(stdout, "-----------------doIt_SendToClient done---------------\n\n");	
+	resetBuffer(pair->buf_send_client);
+	fprintf(stdout, "-----------------doIt_SendToClient done : %d---------------\n\n",(int)n);	
 }
 
 

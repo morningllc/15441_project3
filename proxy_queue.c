@@ -18,7 +18,7 @@ queue_t *new_queue()
 void enqueue(queue_t *queue, int type)
 {
     assert(queue != NULL);
-
+    fprintf(stdout, "****************enqueue : %d*****************\n",type );
     node_t *node = malloc(sizeof(node_t));
     node->data = type;
     node->prev = NULL;
@@ -42,6 +42,7 @@ void enqueue(queue_t *queue, int type)
  */
 int dequeue(queue_t *queue)
 {
+
     assert(queue != NULL);
     assert(queue->size!=0);
     node_t *head = queue->head;
@@ -56,6 +57,7 @@ int dequeue(queue_t *queue)
   	}
   	free(head);
   	queue->size--;
+    fprintf(stdout, "****************dequeue : %d*****************\n",ret );
   	return ret;
 }
 
