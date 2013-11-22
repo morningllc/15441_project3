@@ -105,6 +105,7 @@ typedef struct {
 
 typedef struct {
 	int request_type;
+	int request_bitrate;
 	time_t send_time;
 	char chunk_name[MAXLINE];
 }pstate_t;
