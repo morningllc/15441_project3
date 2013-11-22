@@ -131,7 +131,7 @@ int clientReadByte(socket_t *pair){
 			pair->buf_client->length+=n;
 		}
 	}	
-	return -1;
+	return n;
 }
 
 int serverReadByte(socket_t *pair)

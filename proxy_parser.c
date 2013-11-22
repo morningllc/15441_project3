@@ -4,11 +4,18 @@
 
 extern status_t *proxy_stat;
 
+void checkBuffer(buffer *b,char *name){
+	fprintf(stdout, "-------->check buf:%s<---------\n%s\n",name,b->buf);
+	fprintf(stdout, "size:%d length:%d count:%d ptr:%p buf:%p\n\n",
+		(int)b->size,(int)b->length,(int)b->count,
+		b->ptr,b->buf);
+}
 int parseClientRequest(socket_t *pair){	
 
 	size_t n;
 	char buf[MAXLINE];
 
+	checkBuffer(pair->buf_client,"buf_client");
 	if((n=readLine(pair->buf_client,buf,MAXLINE))==0){
 		fprintf(stderr, "bad request - zero content\n");
 		return -1;
@@ -56,7 +63,7 @@ int parseMethod(socket_t *pair,char *buf){
 			fprintf(stderr, "sscanf fault - uri - 1\n");
 		}
 	}else{
-		if(sscanf(uri,"%[^/]%s",host,path)==0){
+		if(sscanf(uri,"%s",path)==0){
 			fprintf(stderr, "sscanf fault - uri - 2\n");
 		}
 	}

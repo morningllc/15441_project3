@@ -6,7 +6,7 @@
 #include "proxy_socket.h"
 #include "proxy_process.h"
 
-int verbal = 0;
+int verbal = 1;
 status_t *proxy_stat;
 
 int main(int argc, char **argv){
@@ -31,11 +31,12 @@ int main(int argc, char **argv){
 		p.ready_read=p.read_set;
 		p.ready_write=p.write_set;		
 		
+		fprintf(stdout, "selecting......\n");
 		if((p.nready=select(p.maxfd+1,&p.ready_read,&p.ready_write,NULL,NULL))<0){
 			fprintf(stderr, "select error\n");
 			exit(0);
 		}		
-			
+		fprintf(stdout, "select done\n");
 		if(FD_ISSET(listenfd,&p.ready_read)){
 			if((connfd=accept(listenfd,(SA *)&clientaddr,(socklen_t *) &addrlen))<0){
 				fprintf(stderr, "http accept error\n");
@@ -180,9 +181,11 @@ void checkSocketPairs(pool *p){
 
 /*read data*/
 void doIt_ReadClient(socket_t *pair){
+	fprintf(stdout, "-----------------doIt_ReadClient---------------\n");
 	int readn;
 	pool *p=proxy_stat->p;
 	readn=clientReadByte(pair);
+	fprintf(stdout, "-->readn=%d\n",readn);
 
 	if(readn<0){
 		FD_CLR(pair->client_fd,&p->read_set);
@@ -194,11 +197,13 @@ void doIt_ReadClient(socket_t *pair){
 		return;
 	}
 
+
 	if(strstr(pair->buf_client->buf,"\r\n\r\n")!=NULL){
+		fprintf(stdout, "-->parsing....\n");
 		parseClientRequest(pair);
 		doIt_Process(pair);
 	}
-
+	
 }
 
 void updateBitRate()
@@ -207,6 +212,7 @@ void updateBitRate()
 
 void doIt_ReadServer(socket_t *pair)
 {
+	fprintf(stdout, "-----------------doIt_ReadClient---------------\n");
 	int readn;
 	if(pair->server_stat == HEADER){
 		readn = serverReadByte(pair);
@@ -249,8 +255,16 @@ void doIt_ReadServer(socket_t *pair)
 
 void doIt_Process(socket_t *pair)
 {
-  if(pair->server_fd < 0){
-  	open_serverfd(pair);
+	fprintf(stdout, "-----------------doIt_Process---------------\n");
+	if(pair->server_fd < 0){
+		if(open_serverfd(pair)<0){
+			fprintf(stderr, "open_serverfd error\n");
+			if(pair->server_fd>0)
+				close(pair->server_fd);
+			pair->server_fd=-1;
+			return;
+		}
+		fprintf(stderr, "open_serverfd done\n");
 		if(pair->server_fd > proxy_stat->p->maxfd){
 			proxy_stat->p->maxfd = pair->server_fd;
 			FD_SET(pair->server_fd, &proxy_stat->p->read_set);
@@ -260,10 +274,12 @@ void doIt_Process(socket_t *pair)
 		FD_SET(pair->client_fd, &proxy_stat->p->write_set);
 		FD_SET(pair->server_fd, &proxy_stat->p->write_set);
 	}
+	fprintf(stdout, "-----------------doIt_Process done---------------\n\n");
 }
 
 void doIt_SendToServer(socket_t *pair){
-	fprintf(stdout, "--->in send to server\n");
+	
+	fprintf(stdout, "-----------------doIt_SendToServer---------------\n");
 	pool *p=proxy_stat->p;
 	ssize_t n;
 	if((n=send(pair->server_fd,pair->buf_send_server->buf,pair->buf_send_server->length,0))
@@ -277,11 +293,12 @@ void doIt_SendToServer(socket_t *pair){
 	FD_CLR(pair->server_fd,&p->write_set);
 
 	resetBuffer(pair->buf_send_server);
-	fprintf(stdout, "--->send server done\n");	
+	
+	fprintf(stdout, "-----------------doIt_SendToServer done---------------\n\n");	
 }
 
 void doIt_SendToClient(socket_t *pair){
-	fprintf(stdout, "--->in send to client\n");
+	fprintf(stdout, "-----------------doIt_SendToClient---------------\n\n");
 	pool *p=proxy_stat->p;
 	ssize_t n;
 	if((n=send(pair->client_fd,pair->buf_send_server->buf,pair->buf_send_server->length,0))
@@ -295,7 +312,7 @@ void doIt_SendToClient(socket_t *pair){
 	FD_CLR(pair->client_fd,&p->write_set);
 
 	resetBuffer(pair->buf_send_server);
-	fprintf(stdout, "--->send client done \n");	
+	fprintf(stdout, "-----------------doIt_SendToClient done---------------\n\n");	
 }
 
 

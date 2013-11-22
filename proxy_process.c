@@ -77,6 +77,9 @@ int buildRequestHeader(socket_t *pair, char* header){
 		else if(!strncasecmp(tmpbuf,"Connection: close",strlen("Connection: close"))){
 			pair->close=1;
 			strcat(header,tmpbuf);
+		}else if(!strncasecmp(tmpbuf,"Host: ",strlen("Host: "))){
+			strcpy(pair->host,tmpbuf+strlen("Host: "));
+			strcat(header,tmpbuf);
 		}else
 			strcat(header,tmpbuf);
 	}
@@ -91,6 +94,8 @@ int open_serverfd(socket_t *pair)
   char *fake_ip = proxy_stat->fakeIP;
 	char rand_port[] = "5555";
 
+	fprintf(stdout, "fake:%s\nwww:%s\n",proxy_stat->fakeIP, proxy_stat->wwwIP);
+
 	int status, sock;
   struct addrinfo hints;
   memset(&hints, 0, sizeof(struct addrinfo));
@@ -104,7 +109,7 @@ int open_serverfd(socket_t *pair)
 		return -1;
 	}
 
-  if((status = getaddrinfo(fake_ip, rand_port, NULL, &addr)) != 0){
+  if((status = getaddrinfo(fake_ip, rand_port, &hints, &addr)) != 0){
 		fprintf(stderr, "getaddrinfo error\n");
     return -1;
 	}
