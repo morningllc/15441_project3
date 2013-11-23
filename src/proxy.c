@@ -9,7 +9,7 @@
 #include "proxy_log.h"
 #include <sys/timeb.h>
 
-int verbal = 0;
+int verbal = 1;
 status_t *proxy_stat;
 
 int main(int argc, char **argv){
