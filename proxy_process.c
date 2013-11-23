@@ -42,7 +42,7 @@ int buildRequestContent(socket_t *pair){
 	 pstate_t *label = (pstate_t *)malloc(sizeof(pstate_t));
 	 label->request_type=pair->request_type;
 	 if(pair->request_type==TYPE_VIDEO){
-		 label->send_time=getSystemTime();
+		 label->send_time=getSystemTime()-100;
 		 sprintf(label->chunk_name,"Seg%d-Frag%d",pair->seg_num,pair->frag_num);
 		 label->request_bitrate=proxy_stat->bitrate;
 	 }
@@ -169,7 +169,7 @@ int open_serverfd(socket_t *pair)
 
 
 int addData(buffer *b,void* data,size_t len){
-	//fprintf(stdout, "--->addData\n");
+	fprintf(stdout, "--->addData\n");
 
 	int offset=b->ptr-b->buf;
 
