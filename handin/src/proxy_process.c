@@ -3,7 +3,7 @@
 #include "proxy_socket.h"
 #include "proxy_parser.h"
 extern status_t *proxy_stat;
-
+extern int verbal;
 int buildRequestContent(socket_t *pair){
 	 char request[BUFFERSIZE]={0};
 	 char header[BUFFERSIZE]={0};
@@ -169,6 +169,7 @@ int open_serverfd(socket_t *pair)
 
 
 int addData(buffer *b,void* data,size_t len){
+	if(verbal)
 	fprintf(stdout, "--->addData\n");
 
 	int offset=b->ptr-b->buf;
