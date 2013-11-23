@@ -7,7 +7,7 @@
 
 buffer *initBuffer();
 void freeBuffer(buffer *b);
-int resetBuffer(buffer *b);
+buffer *resetBuffer(buffer *b);
 
 int initSocketBuffer(socket_t *s);
 void cleanSocketBuffer(socket_t *s);
