@@ -9,7 +9,7 @@
 #include "proxy_log.h"
 #include <sys/timeb.h>
 
-int verbal = 1;
+int verbal = 0;
 status_t *proxy_stat;
 
 int main(int argc, char **argv){
@@ -215,7 +215,7 @@ void doIt_ReadClient(socket_t *pair){
 		if(verbal) fprintf(stdout, "-->parsing....cfd=%d ---\n",pair->client_fd);
 		if(parseClientRequest(pair)<0){
 			fprintf(stderr, "parsing error\n");
-			resetBuffer(pair->buf_client);
+			pair->buf_client = resetBuffer(pair->buf_client);
 			return;
 		}
 		if(verbal) fprintf(stdout, "-->parsing done....cfd=%d ---\n",pair->client_fd);
@@ -240,9 +240,7 @@ void doIt_ReadServer(socket_t *pair)
 
 		if(verbal>1) fprintf(stdout, "header readn=%d\n", readn);
     if(readn <= 0){
-    	// tmpppppp++;
-    	// fprintf(stdout, "tmpppppp %d\n", tmpppppp);
-    	// if(tmpppppp>10) exit(0);
+    	
     	if(verbal) fprintf(stdout, "header readn=%d cfd=%d\n", readn,pair->client_fd);
     		checkBuffer(pair->buf_server, "a");
     		if(pair->server_fd>0)
@@ -250,8 +248,8 @@ void doIt_ReadServer(socket_t *pair)
 			FD_CLR(pair->server_fd,&proxy_stat->p->read_set);
 			FD_CLR(pair->server_fd,&proxy_stat->p->write_set);
 			pair->server_fd=-1;
-			resetBuffer(pair->buf_server);
-			resetBuffer(pair->buf_send_server);
+			pair->buf_server = resetBuffer(pair->buf_server);
+			pair->buf_send_server = resetBuffer(pair->buf_send_server);
 			pair->recv = 0;
 			pair->left = 0;
 			pair->contentlen = 0;
@@ -271,7 +269,7 @@ void doIt_ReadServer(socket_t *pair)
 			else{
 				dequeue(pair->requestQueue);
 			}
-			resetBuffer(pair->buf_server);
+			pair->buf_server = resetBuffer(pair->buf_server);
 		}
 	}
 	else{
@@ -284,8 +282,8 @@ void doIt_ReadServer(socket_t *pair)
 			FD_CLR(pair->server_fd,&proxy_stat->p->read_set);
 			FD_CLR(pair->server_fd,&proxy_stat->p->write_set);
 			pair->server_fd=-1;
-			resetBuffer(pair->buf_server);
-			resetBuffer(pair->buf_send_server);
+			pair->buf_server = resetBuffer(pair->buf_server);
+			pair->buf_send_server = resetBuffer(pair->buf_send_server);
 			pair->recv = 0;
 			pair->left = 0;
 			pair->contentlen = 0;
@@ -329,6 +327,7 @@ void doIt_Process(socket_t *pair)
 			pair->server_fd=-1;
 			return;
 		}
+		if(verbal)
 		fprintf(stdout, "open_serverfd done cfd=%d\n",pair->client_fd);
 		if(pair->server_fd > proxy_stat->p->maxfd){
 			proxy_stat->p->maxfd = pair->server_fd;
@@ -338,7 +337,7 @@ void doIt_Process(socket_t *pair)
 	if(buildRequestContent(pair)>=0){
 		// FD_SET(pair->client_fd, &proxy_stat->p->write_set);
 		FD_SET(pair->server_fd, &proxy_stat->p->write_set);
-		resetBuffer(pair->buf_client);
+		pair->buf_client = resetBuffer(pair->buf_client);
 	}
 
 	if(verbal) fprintf(stdout, "-----------------doIt_Process done---------------\n\n");
@@ -359,7 +358,7 @@ void doIt_SendToServer(socket_t *pair){
 	}
 	// FD_CLR(pair->server_fd,&p->write_set);
 	checkBuffer(pair->buf_send_server, "send to server");
-	resetBuffer(pair->buf_send_server);
+	pair->buf_send_server = resetBuffer(pair->buf_send_server);
 	
 	if(verbal) fprintf(stdout, "-----------------doIt_SendToServer done : %d---------------\n\n",(int)n);	
 }
@@ -378,7 +377,7 @@ void doIt_SendToClient(socket_t *pair){
 	}
 	// FD_CLR(pair->client_fd,&p->write_set);
 	//checkBuffer(pair->buf_send_client, ">>>>>send to client<<<<<");
-	if(resetBuffer(pair->buf_send_client)<0){
+	if((pair->buf_send_client = resetBuffer(pair->buf_send_client)) == NULL){
 		fprintf(stderr, "error in resetBuffer\n");
 		exit(0);
 	}

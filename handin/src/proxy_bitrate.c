@@ -27,7 +27,7 @@ void update_bitrate(long long t1, long long t2, int size, int bit, char* chunkna
 		proxy_stat->bitrate = next;
 	}
 
-	if(proxy_stat->t < 1.5*prev*1000){
+	if(proxy_stat->t < proxy_stat->bitrate*1000){
 		proxy_stat->bitrate = prev;
 	}
 

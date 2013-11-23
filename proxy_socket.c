@@ -3,7 +3,6 @@
 #include "proxy.h"
 
 extern status_t *proxy_stat;
-extern int verbal;
 /*buffer manipulations*/
 buffer *initBuffer(){
 	buffer *b;
@@ -27,15 +26,12 @@ void freeBuffer(buffer *b){
 		b=NULL;
 	}
 }
-buffer* resetBuffer(buffer *b){
+int resetBuffer(buffer *b){
 	freeBuffer(b);
-	return initBuffer();
-/*
 	if((b=initBuffer())==NULL){
 		return -1;
 	}
 	return 0;
-*/
 }
 int initSocketBuffer(socket_t *s){
 	if((s->buf_server=initBuffer())==NULL){
