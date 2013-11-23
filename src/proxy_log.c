@@ -4,11 +4,13 @@
 #include "proxy_log.h"
 // #include "proxy.h"
 static FILE *logFile;
-
+extern int verbal;
 /**
  * create logfile
  */
 void createLogFile(char *filename){
+	if(verbal)
+		fprintf(stdout, "create log file : %s\n",filename);
 	if ((logFile=fopen(filename,"w"))==NULL){
 		fprintf(stderr, "Error:in creating log file\n");
 		exit(0);
@@ -29,10 +31,13 @@ void closeLogFile() {
 
 
 void logWrite(float duration, float tput,float avg_tput, int bitrate, char *client_ip,char *chunkname){
+	// if(verbal) 
+		// fprintf(stdout, "\n>>>>>>>logging.................\n");
 	if(logFile!=NULL){
 		time_t timetmp=time(NULL);
 
 		fprintf(logFile, "%d %.2f %.2f %.2f %d %s %s\n",(int)timetmp,duration,tput,avg_tput,bitrate,client_ip,chunkname );
+		fflush(logFile);
 	}else
 		fprintf(stderr, "Error:log file is not opened\n");
 }

@@ -119,7 +119,7 @@ int open_serverfd(socket_t *pair)
   //unsigned short rand_port = rand()%100000;
   unsigned short rand_port = 0;
 
-	fprintf(stdout, "fake:%s\nwww:%s\n",proxy_stat->fakeIP, proxy_stat->wwwIP);
+	if(verbal)fprintf(stdout, "fake:%s\nwww:%s\n",proxy_stat->fakeIP, proxy_stat->wwwIP);
 
 	int status, sock;
   struct addrinfo hints;

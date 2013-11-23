@@ -6,7 +6,7 @@
 #include "proxy_log.h"
 
 extern status_t *proxy_stat;
-
+extern int verbal;
 void update_bitrate(long long t1, long long t2, int size, int bit, char* chunkname, char *client_ip)
 {
 	float alpha = proxy_stat->alpha;
@@ -30,8 +30,8 @@ void update_bitrate(long long t1, long long t2, int size, int bit, char* chunkna
 	if(proxy_stat->t < proxy_stat->bitrate*1000){
 		proxy_stat->bitrate = prev;
 	}
-
-	printf("---------------------throughput = %lf -------------------\n",t);
+	if(verbal)
+		fprintf(stdout,"---------------------throughput = %lf -------------------\n",t/1000);
 
 	if((float)(t2-t1)/1000 <= 0.01){
 		printf("t2 = %lld\n", t2);
