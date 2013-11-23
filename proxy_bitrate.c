@@ -3,25 +3,36 @@
 #include <time.h>
 #include "proxy_bitrate.h"
 #include "proxy.h"
+#include "proxy_log.h"
 
 extern status_t *proxy_stat;
 
-void update_bitrate(time_t t1, time_t t2, int size)
+void update_bitrate(long long t1, long long t2, int size, int bit, char* chunkname, char *client_ip)
 {
 	float alpha = proxy_stat->alpha;
-	float t = (float)size/((float)t2-(float)t1);
+	float t = ((float)(size)/((float)(t2-t1))) * 8000;
 	proxy_stat->t = alpha*t + (1-alpha)*proxy_stat->t;
 	
+	if(t<0){
+	  printf("size = %d\n", size);
+	  printf("t1 = %lld\n", t1);
+	  printf("t2 = %lld\n", t2);
+	  exit(0);
+	}
+
 	int next = next_bitrate();
 	int prev = prev_bitrate();
 
-	if(proxy_stat->t > 1.5*next){
+	if(proxy_stat->t > 1.5*next*1000){
 		proxy_stat->bitrate = next;
 	}
 
-	if(proxy_stat->t < 1.5*prev){
+	if(proxy_stat->t < 1.5*prev*1000){
 		proxy_stat->bitrate = prev;
 	}
+
+	printf("---------------------throughput = %lf -------------------\n",t);
+	logWrite((float)(t2-t1)/1000, t, proxy_stat->t, bit, client_ip, chunkname);
 }
 
 int next_bitrate()

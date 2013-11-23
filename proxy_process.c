@@ -42,7 +42,7 @@ int buildRequestContent(socket_t *pair){
 	 pstate_t *label = (pstate_t *)malloc(sizeof(pstate_t));
 	 label->request_type=pair->request_type;
 	 if(pair->request_type==TYPE_VIDEO){
-		 label->send_time=time(NULL);
+		 label->send_time=getSystemTime();
 		 sprintf(label->chunk_name,"Seg%d-Frag%d",pair->seg_num,pair->frag_num);
 		 label->request_bitrate=proxy_stat->bitrate;
 	 }
@@ -116,7 +116,8 @@ int open_serverfd(socket_t *pair)
   char *server_ip = proxy_stat->wwwIP;
   char server_port[] = "8080";
   char *fake_ip = proxy_stat->fakeIP;
-  unsigned short rand_port = rand()%100000;
+  //unsigned short rand_port = rand()%100000;
+  unsigned short rand_port = 0;
 
 	fprintf(stdout, "fake:%s\nwww:%s\n",proxy_stat->fakeIP, proxy_stat->wwwIP);
 

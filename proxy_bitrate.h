@@ -3,7 +3,7 @@
 
 #include <time.h>
 
-void update_bitrate(time_t t1, time_t t2, int size);
+void update_bitrate(long long t1, long long t2, int size, int bit, char* chunkname, char* client_ip);
 
 int next_bitrate(void);
 

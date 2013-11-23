@@ -7,6 +7,7 @@
 #include "proxy_process.h"
 #include "proxy_bitrate.h"
 #include "proxy_log.h"
+#include <sys/timeb.h>
 
 int verbal = 1;
 status_t *proxy_stat;
@@ -267,6 +268,9 @@ void doIt_ReadServer(socket_t *pair)
 			if(pair->contentlen > 0){
 				pair->server_stat = CONTENT;
 			}
+			else{
+				dequeue(pair->requestQueue);
+			}
 			resetBuffer(pair->buf_server);
 		}
 	}
@@ -296,7 +300,7 @@ void doIt_ReadServer(socket_t *pair)
 				addData(pair->buf_send_client, pair->content_buf, pair->contentlen);
 			}
 			else if(req->request_type == TYPE_VIDEO){
-				update_bitrate(req->send_time, time(NULL), pair->contentlen);
+				update_bitrate(req->send_time, getSystemTime(), pair->contentlen, req->request_bitrate, req->chunk_name, pair->remote_addr);
 				addData(pair->buf_send_client, pair->content_buf, pair->contentlen);
 			}
 			else{
@@ -418,3 +422,11 @@ void closeProxy(){
     closeLogFile();
     exit(0);
 }
+
+long long getSystemTime()
+{
+	struct timeb t;
+	ftime(&t);
+	return 1000*t.time+t.millitm;
+}
+
