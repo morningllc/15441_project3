@@ -3,6 +3,7 @@
 #include "proxy.h"
 
 extern status_t *proxy_stat;
+extern int verbal;
 /*buffer manipulations*/
 buffer *initBuffer(){
 	buffer *b;

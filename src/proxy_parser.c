@@ -3,8 +3,9 @@
 #include "proxy.h"
 
 extern status_t *proxy_stat;
-
+extern int verbal;
 void checkBuffer(buffer *b,char *name){
+	if (verbal==0) return;
 	fprintf(stdout, "-------->check buf:%s<---------\n%s\n",name,b->buf);
 	fprintf(stdout, "size:%d length:%d count:%d ptr:%p buf:%p\n\n",
 		(int)b->size,(int)b->length,(int)b->count,

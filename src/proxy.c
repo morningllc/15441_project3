@@ -9,7 +9,7 @@
 #include "proxy_log.h"
 #include <sys/timeb.h>
 
-int verbal = 1;
+int verbal = 0;
 status_t *proxy_stat;
 
 int main(int argc, char **argv){
@@ -240,9 +240,7 @@ void doIt_ReadServer(socket_t *pair)
 
 		if(verbal>1) fprintf(stdout, "header readn=%d\n", readn);
     if(readn <= 0){
-    	// tmpppppp++;
-    	// fprintf(stdout, "tmpppppp %d\n", tmpppppp);
-    	// if(tmpppppp>10) exit(0);
+    	
     	if(verbal) fprintf(stdout, "header readn=%d cfd=%d\n", readn,pair->client_fd);
     		checkBuffer(pair->buf_server, "a");
     		if(pair->server_fd>0)
@@ -329,6 +327,7 @@ void doIt_Process(socket_t *pair)
 			pair->server_fd=-1;
 			return;
 		}
+		if(verbal)
 		fprintf(stdout, "open_serverfd done cfd=%d\n",pair->client_fd);
 		if(pair->server_fd > proxy_stat->p->maxfd){
 			proxy_stat->p->maxfd = pair->server_fd;
