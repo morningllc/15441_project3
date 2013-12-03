@@ -9,10 +9,12 @@
 #include "proxy_log.h"
 #include <sys/timeb.h>
 
-int verbal = 1;
+int verbal = 0;
 status_t *proxy_stat;
 
 int main(int argc, char **argv){
+	if(verbal)
+		fprintf(stdout,"--------------proxy start-----------------\n");
 	int listenfd,connfd;
 	int addrlen=sizeof(struct sockaddr_in);
 	struct sockaddr_in clientaddr;
@@ -41,8 +43,9 @@ int main(int argc, char **argv){
 			exit(0);
 		}		
 		if(verbal>1) fprintf(stdout, "select done\n");
-		if(FD_ISSET(listenfd,&p.ready_read)){
-			printf("--------------browser connecting-----------------\n");
+		if(FD_ISSET(listenfd,&p.ready_read)){			
+			if(verbal)
+				fprintf(stdout,"--------------browser connecting-----------------\n");
 			if((connfd=accept(listenfd,(SA *)&clientaddr,(socklen_t *) &addrlen))<0){
 				fprintf(stderr, "http accept error\n");
 				continue;
