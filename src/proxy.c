@@ -26,6 +26,7 @@ int main(int argc, char **argv){
 	initPool(&p);	
 	proxy_stat->p=&p;
 	createLogFile(proxy_stat->logFile);
+	
 	if((listenfd=open_listenfd(proxy_stat->listenPort))<0){
 		fprintf(stderr, "error in open_listenfd\n");
 		return -1;
