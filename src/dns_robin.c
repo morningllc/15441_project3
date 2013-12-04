@@ -28,8 +28,9 @@ robin_list_t* initRobinList(char *filename){
 		new->next=NULL;
 		sscanf(line,"%"SCNu8".%"SCNu8".%"SCNu8".%"SCNu8"",
 			&new->ip.ip[0],&new->ip.ip[1],&new->ip.ip[2],&new->ip.ip[3]);
-		strncpy(new->ip.ip_str,line,strlen(line));
-
+		strcpy(new->ip.ip_str,line);
+		int tmplen = strlen(new->ip.ip_str);
+		new->ip.ip_str[tmplen-1]=0;
 		if(list->head==NULL){
 			list->head=new;
 			list->tail=new;

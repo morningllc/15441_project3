@@ -43,7 +43,7 @@ void enqueue(queue_t *queue, void *data)
 void *dequeue(queue_t *queue)
 {
   assert(queue != NULL);
-
+  //fprintf(stdout, "-----deQ-----\n");
   node_t *head = queue->head;
   if(queue->size == 0){
   assert(queue->head == NULL);
@@ -92,13 +92,20 @@ int enqueuePQ(queue_t *queue, void *data,int weight)
     node_t *ptr;
     for(ptr = queue->head;ptr != NULL; ptr = ptr->next){
       if(weight <= ptr->weight){
-        node->prev = ptr->prev;
-        ptr->prev = node;
-        node->next = ptr;
+        if(ptr == queue->head){
+          node->next = queue->head;
+          queue->head = node;
+        }else{
+          node->prev = ptr->prev;
+          ptr->prev->next = node;
+          ptr->prev = node;
+          node->next = ptr;
+        }
         break;
       }
     }
     if(ptr == NULL){
+      queue->tail->next = node;
       node->prev = queue->tail;
       queue->tail = node;
     }
