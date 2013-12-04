@@ -1,5 +1,6 @@
 #include "dns_parser.h"
 #include "dns.h"
+#include "dns_robin.h"
 
 extern status_t *DNS_stat;
 extern int verbal;
@@ -19,7 +20,7 @@ int parse(char *buf,size_t len,SA *addr){
 
 		if(!strcmp(name,REQUESTNAME)){
 			printf("right\n");
-			buildResponseData(packet->data,len-HEADER_LEN,data);
+			buildResponseData(packet->data,len-HEADER_LEN,data,addr);
 	   	sendPacket=construct_response_packet(0,len-HEADER_LEN+16,data,addr);
 		}else{
 			sendPacket=construct_response_packet(3,len-HEADER_LEN,packet->data,addr);
@@ -62,7 +63,7 @@ int parseRequestData(char *data,char *buf){
 	return 0;
 }
 
-int buildResponseData(char *request,size_t len, char* ret){
+int buildResponseData(char *request,size_t len, char* ret,SA *addr){
 	if(verbal>1)
 		fprintf(stdout, "-----------in buildResponseData----------\n");	
 
@@ -71,9 +72,22 @@ int buildResponseData(char *request,size_t len, char* ret){
 	// char name[MAXLINE];
 	// sprintf(name,"%c%s%c%s%c%s%c%s%c",5,"video",2,"cs",3,"cmu",3,"edu",0);
 	//unsigned short name = 0xc00c;
-  sprintf(ret+len,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",0xc,0xc0,1,0,1,0,0,0,0,0,4,0,1,0,0,1);
+	ip_t *ip=getIP(addr);
+    sprintf(ret+len,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+    	0xc,0xc0,1,0,1,0,0,0,0,0,4,0,ip->ip[0],ip->ip[1],ip->ip[2],ip->ip[3]);
 
 return 0;
+}
+
+ip_t *getIP(SA *addr){
+
+	if(DNS_stat->robinFlag){
+		return getIP_Robin(DNS_stat->robin_list);
+	}else{
+
+	}
+
+	return NULL;
 }
 
 

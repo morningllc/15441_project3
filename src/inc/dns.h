@@ -21,6 +21,7 @@
 
 
 #include "dns_queue.h"
+#include "dns_robin.h"
 
 #define MAXLINE  1024
 #define BUFFERSIZE 8192
@@ -31,7 +32,8 @@ typedef struct sockaddr SA;
 
 #include "dns_packet_server.h"
 
-typedef struct {	
+typedef struct {
+	int robinFlag;	
 	int port;
 	char *ip;
 	char *logFile;
@@ -39,6 +41,7 @@ typedef struct {
 	char *LSAs;
 	queue_t *send_packets;
 	send_packet_t *sending;
+	robin_list_t* robin_list;
 }status_t;
 
 

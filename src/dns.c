@@ -3,6 +3,7 @@
 #include "dns_packet_server.h"
 #include "dns_log.h"
 #include "dns_queue.h"
+#include "dns_robin.h"
 
 int verbal=2;
 status_t* DNS_stat;
@@ -60,12 +61,14 @@ status_t* initDNSServer(int argc, char **argv){
 			fprintf(stderr,USAGE);
 			exit(0);
 		}
+		state->robinFlag=1;
 		state->logFile = argv[2];;
 		state->ip = argv[3];
 		state->port = atoi(argv[4]);
 		state->serverFile = argv[5];
 		state->LSAs = argv[6];
 	}else{
+		state->robinFlag=0;
 		state->logFile = argv[1];;
 		state->ip = argv[2];
 		state->port = atoi(argv[3]);
@@ -73,6 +76,11 @@ status_t* initDNSServer(int argc, char **argv){
 		state->LSAs = argv[5];
 	}
 	state->send_packets=new_queue();
+	if(state->robinFlag)
+		state->robin_list = initRobinList(state->serverFile);
+	else
+		state->robin_list = NULL; 
+
 	return state;
 }
 
