@@ -84,7 +84,7 @@ ip_t *getIP(SA *addr){
 	if(DNS_stat->robinFlag){
 		return getIP_Robin(DNS_stat->robin_list);
 	}else{
-
+		// getIP_LSAs(DNS_stat->graph, char* src, servers);
 	}
 
 	return NULL;

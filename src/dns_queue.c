@@ -1,4 +1,4 @@
-#include "proxy_queue.h"
+#include "dns_queue.h"
 #include <assert.h>
 
 /**
@@ -72,4 +72,38 @@ void free_queue(queue_t *queue)
     dequeue(queue);
   }
   free(queue);
+}
+
+int enqueuePQ(queue_t *queue, void *data,int weight)
+{
+  assert(queue != NULL);
+  assert(data != NULL);
+
+  node_t *node = malloc(sizeof(node_t));
+  node->weight=weight;
+  node->data = data;
+  node->prev = NULL;
+  node->next = NULL;
+
+  if(queue->tail == NULL){
+    queue->head = node;
+    queue->tail = node;
+  }else{
+    node_t *ptr;
+    for(ptr = queue->head;ptr != NULL; ptr = ptr->next){
+      if(weight <= ptr->weight){
+        node->prev = ptr->prev;
+        ptr->prev = node;
+        node->next = ptr;
+        break;
+      }
+    }
+    if(ptr == NULL){
+      node->prev = queue->tail;
+      queue->tail = node;
+    }
+  }
+
+  queue->size++;
+  return 0;
 }
