@@ -42,9 +42,11 @@ typedef struct{
 typedef struct{
 	int size;
 	int sent;
-	SA *address;
+	SA address;
 	packet_t *data;
 }send_packet_t;
 
+send_packet_t* construct_response_packet(uint8_t rcode,int len,char *data,SA *addr);
+void free_send_packet(send_packet_t *p);
 
 #endif

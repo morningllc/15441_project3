@@ -1,18 +1,21 @@
-#include "dns_packet_server.h"
 #include "dns.h"
+#include "dns_packet_server.h"
 #include "dns_parser.h"
+
 extern status_t *DNS_stat;
 extern int verbal;
 
 send_packet_t* construct_response_packet(uint8_t rcode,int len,char *data,SA *addr){
-	
+	if(verbal>1)
+		fprintf(stdout, "--------------in construct_response_packet-------------\n");
+
 	send_packet_t *packet;
 	if((packet=(send_packet_t *)malloc(sizeof(send_packet_t)))==NULL){
 		return NULL;
 	}
 	packet->size=len+HEADER_LEN;
 	packet->sent=0;
-	packet->address=addr;
+	packet->address=*addr;
 
 	if((packet->data=(packet_t *)malloc(sizeof(packet_t)))==NULL){
 		free(packet);
@@ -41,3 +44,20 @@ send_packet_t* construct_response_packet(uint8_t rcode,int len,char *data,SA *ad
 	return packet;
 
 }
+
+
+void free_send_packet(send_packet_t *p){
+	free(p->data);
+	free(p);
+}
+
+
+
+
+
+
+
+
+
+
+

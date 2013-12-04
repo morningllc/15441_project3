@@ -2,6 +2,7 @@
 #include "dns_parser.h"
 #include "dns_packet_server.h"
 #include "dns_log.h"
+#include "dns_queue.h"
 
 int verbal=0;
 status_t* DNS_stat;
@@ -71,27 +72,38 @@ status_t* initDNSServer(int argc, char **argv){
 		state->serverFile = argv[4];
 		state->LSAs = argv[5];
 	}
+	state->send_packets=new_queue();
 	return state;
 }
 
 int doIt_Read(int fd){
 	socklen_t addrlen=sizeof(struct sockaddr_in);
-	struct sockaddr_in *clientaddr = (struct sockaddr_in *) malloc(sizeof(struct sockaddr_in));
-	// struct sockaddr_in clientaddr;
-	char *buf;
+	struct sockaddr_in clientaddr;
+	char buf[MAXLINE];
 
-	if((buf=(char *)calloc(BUFFERSIZE,sizeof(char)))==NULL){
+	int recvret;
+	if((recvret=recvfrom(fd, buf, BUFFERSIZE, 0, (SA *) &clientaddr, &addrlen))<0){
+		fprintf(stderr, "error while recieving data\n" );
 		return -1;
 	}
 
-	int recvret = recvfrom(fd, buf, BUFFERSIZE, 0, (SA *) clientaddr, &addrlen);
+	parse(buf,recvret,(SA *)&clientaddr);
 
-
-
-	return recvret;
+	return 0;
 }
 
 int doIt_Send(int fd){
+	send_packet_t *send = DNS_stat->sending;
+	if(send != NULL){
+		int sendret = sendto(fd,((char *)send->data)+(send->sent),(send->size)-(send->sent),0,&(send->address),sizeof(send->address));
+		send->sent += sendret;
+		if(send->sent == send->size){
+			free_send_packet(send);
+			DNS_stat->sending= (send_packet_t *)dequeue(DNS_stat->send_packets);
+		}
+	}else{
+		DNS_stat->sending = (send_packet_t *)dequeue(DNS_stat->send_packets);
+	}
 
 	return 0;
 }

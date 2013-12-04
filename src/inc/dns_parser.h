@@ -9,6 +9,6 @@
 #define HEADER_LEN    12
 
 int parse(char* buf,size_t len,SA *address);
-int parseData(char *data,char *buf);
-
+int parseRequestData(char *data,char *buf);
+int buildResponseData(char *request, char *ret);
 #endif

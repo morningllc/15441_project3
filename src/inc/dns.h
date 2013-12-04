@@ -19,6 +19,9 @@
 #include <fcntl.h>
 #include <time.h>
 
+
+#include "dns_queue.h"
+
 #define MAXLINE  1024
 #define BUFFERSIZE 8192
 #define LISTENQ  1024
@@ -26,22 +29,7 @@
 #define USAGE "usage: nameserver [-r] <log> <ip> <port> <servers> <LSAs>\n"
 typedef struct sockaddr SA;
 
-typedef struct{
-	char *ptr;
-	char *buf;
-	size_t count;
-	size_t length;
-	size_t size;
-} buffer;
-
-typedef struct{
-	int fd;	
-	char *remote_addr;
-	buffer *buf_recv;
-	buffer *buf_send;
-} client_t;
-
-
+#include "dns_packet_server.h"
 
 typedef struct {	
 	int port;
@@ -49,6 +37,8 @@ typedef struct {
 	char *logFile;
 	char *serverFile;
 	char *LSAs;
+	queue_t *send_packets;
+	send_packet_t *sending;
 }status_t;
 
 
