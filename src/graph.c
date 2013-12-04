@@ -12,6 +12,7 @@ gnode_t *construct_graph(char *file)
 
 	char line[MAXLINE] = {0};
 	while(fgets(line, MAXLINE, lsa) != NULL){
+		printf("add node\n");
 		char name[MAXLINE] = {0};
 		int seqNum = 0;
 		char neighbors[MAXLINE] = {0};
@@ -20,25 +21,32 @@ gnode_t *construct_graph(char *file)
 		graph = update_graph(graph, name, seqNum, neighbors);
 	}
 
+	gnode_t *tmp = graph;
+	while(tmp != NULL){
+		printf("node = %s\n", tmp->name);
+		tmp = tmp->next;
+	}
+
 	fclose(lsa);
 	return graph;
 }
 
 gnode_t *update_graph(gnode_t *graph, char *name, int seqNum, char *neighbors)
 {
-	while(graph != NULL){
-		if(strcmp(graph->name, name) == 0){
-			if(graph->seqNum >= seqNum){
+	gnode_t *tmp = graph;
+	while(tmp != NULL){
+		if(strcmp(tmp->name, name) == 0){
+			if(tmp->seqNum >= seqNum){
 				return graph;
 			}
 			else{
-				graph->seqNum = seqNum;
-				free_neighbors(graph->neighbors);
-				graph->neighbors = construct_neighbors(neighbors);
+				tmp->seqNum = seqNum;
+				free_neighbors(tmp->neighbors);
+				tmp->neighbors = construct_neighbors(neighbors);
 				return graph;
 			}
 		}	
-		graph = graph->next;
+		tmp = tmp->next;
 	}
 
 	gnode_t *new_node = calloc(1,sizeof(gnode_t));
