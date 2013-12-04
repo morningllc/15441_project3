@@ -34,5 +34,9 @@ run2: proxy
 rundns1: nameserver
 	./nameserver -r dnslog.txt $(DNSIP) $(DNSPORT)  topos/topo1/topo1.servers topos/topo1/topo1.lsa
 
+rundns2: nameserver
+	./nameserver dnslog.txt $(DNSIP) $(DNSPORT)  topos/topo1/topo1.servers topos/topo1/topo1.lsa
+
+
 clean:
 	@rm -f *~ *.o proxy nameserver

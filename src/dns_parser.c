@@ -1,6 +1,8 @@
 #include "dns_parser.h"
 #include "dns.h"
 #include "dns_robin.h"
+#include "dns_dijkstra.h"
+#include "dns_log.h"
 
 extern status_t *DNS_stat;
 extern int verbal;
@@ -9,6 +11,9 @@ int parse(char *buf,size_t len,SA *addr){
 	if(verbal>1)
 		fprintf(stdout, "--------------in parse-------------\n");
 	
+	struct sockaddr_in tmpaddr =  *((struct sockaddr_in*)addr);
+ 	char* clientIP = inet_ntoa(tmpaddr.sin_addr);
+
 	char name[MAXLINE] = {0};
 	char data[MAXLINE] = {0};
 
@@ -19,10 +24,10 @@ int parse(char *buf,size_t len,SA *addr){
 		parseRequestData(packet->data,name);
 
 		if(!strcmp(name,REQUESTNAME)){
-			printf("right\n");
-			buildResponseData(packet->data,len-HEADER_LEN,data,addr);
-	   	sendPacket=construct_response_packet(0,len-HEADER_LEN+16,data,addr);
+			int datalen=buildResponseData(packet->data,len-HEADER_LEN,data,clientIP);
+	   		sendPacket=construct_response_packet(0,datalen,data,addr);
 		}else{
+			logWrite(clientIP,name,"");
 			sendPacket=construct_response_packet(3,len-HEADER_LEN,packet->data,addr);
 		}
 
@@ -63,32 +68,41 @@ int parseRequestData(char *data,char *buf){
 	return 0;
 }
 
-int buildResponseData(char *request,size_t len, char* ret,SA *addr){
+int buildResponseData(char *request,size_t len, char* ret,char *clientIP){
 	if(verbal>1)
 		fprintf(stdout, "-----------in buildResponseData----------\n");	
-
-	//size_t len = strlen(request);
 	memcpy(ret,request,len);
-	// char name[MAXLINE];
-	// sprintf(name,"%c%s%c%s%c%s%c%s%c",5,"video",2,"cs",3,"cmu",3,"edu",0);
-	//unsigned short name = 0xc00c;
-	ip_t *ip=getIP(addr);
+
+	
+
+	ip_t *ip=getIP(clientIP);
+
+
+	if(ip==NULL){
+		logWrite(clientIP,REQUESTNAME,"");
+	 	return len;
+	}
+
+	logWrite(clientIP,REQUESTNAME,ip->ip_str);
+
     sprintf(ret+len,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
     	0xc,0xc0,1,0,1,0,0,0,0,0,4,0,ip->ip[0],ip->ip[1],ip->ip[2],ip->ip[3]);
 
-return 0;
+	return len+16;
 }
 
-ip_t *getIP(SA *addr){
+ip_t *getIP(char *clientIP){
 
-	// (struct sockaddr_in*)addr;
+	if(verbal>1)
+		fprintf(stdout, "-----in getIP-----\n");
 
 	if(DNS_stat->robinFlag){
 		return getIP_Robin(DNS_stat->robin_list);
 	}else{
-		// getIP_LSAs(DNS_stat->graph, char* src, servers);
+		return getIP_LSAs(DNS_stat->lsaGraph, clientIP, DNS_stat->robin_list);
 	}
-
+	if(verbal>1)
+			fprintf(stdout, "-----in getIP fail-----\n");
 	return NULL;
 }
 

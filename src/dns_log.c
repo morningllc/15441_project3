@@ -24,3 +24,14 @@ void closeLogFile() {
 			exit(0);	
 		}
 }
+
+void logWrite(char* clientIP,char* query,char* response){
+	
+	if(logFile!=NULL){
+		time_t timetmp=time(NULL);
+
+		fprintf(logFile, "%d %s %s %s\n",(int)timetmp,clientIP,query,response);
+		fflush(logFile);
+	}else
+		fprintf(stderr, "Error:log file is not opened\n");
+}

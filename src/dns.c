@@ -78,9 +78,8 @@ status_t* initDNSServer(int argc, char **argv){
 	}
 	state->send_packets=new_queue();
 	if(state->robinFlag==0)
-	  state->lsaGraph = construct_graph(state->LSAs);
-		state->robin_list = initRobinList(state->serverFile);
-
+	    state->lsaGraph = construct_graph(state->LSAs);
+	state->robin_list = initRobinList(state->serverFile);
 	return state;
 }
 

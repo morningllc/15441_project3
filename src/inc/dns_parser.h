@@ -10,7 +10,7 @@
 
 int parse(char* buf,size_t len,SA *address);
 int parseRequestData(char *data,char *buf);
-int buildResponseData(char *request,size_t len, char* ret,SA *addr);
-ip_t *getIP(SA *addr);
+int buildResponseData(char *request,size_t len, char* ret,char *clientIP);
+ip_t *getIP(char *clientIP);
 
 #endif

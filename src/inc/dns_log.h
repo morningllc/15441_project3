@@ -9,6 +9,6 @@
 
 void createLogFile(char *filename);
 void closeLogFile() ;
-// void logWrite(float duration, float tput,float avg_tput, int bitrate, char *client_ip,char *chunkname);
+void logWrite(char* clientIP,char* query,char* response);
 
 #endif
