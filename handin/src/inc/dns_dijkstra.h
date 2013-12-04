@@ -18,8 +18,5 @@ gnode_t *findGraphNode(char *name,gnode_t* graph);
 ip_t *isServer(char *name,robin_list_t* list);
 void addToPQ(gnode_t *neighbors,int weight,queue_t *PQ);
 void freeALL(queue_t *PQ,d_node_t *list);
-void checkGraph(gnode_t* graph);
-void checkQ(queue_t *Q);
-void checkL(d_node_t *L);
 
 #endif
