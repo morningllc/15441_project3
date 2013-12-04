@@ -10,5 +10,5 @@
 
 int parse(char* buf,size_t len,SA *address);
 int parseRequestData(char *data,char *buf);
-int buildResponseData(char *request, char *ret);
+int buildResponseData(char *request,size_t len,char *ret);
 #endif

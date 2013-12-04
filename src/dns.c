@@ -4,7 +4,7 @@
 #include "dns_log.h"
 #include "dns_queue.h"
 
-int verbal=0;
+int verbal=2;
 status_t* DNS_stat;
 
 int main(int argc, char **argv){
@@ -30,12 +30,12 @@ int main(int argc, char **argv){
 		FD_SET(listenfd,&read_set);
 		FD_SET(listenfd,&write_set);
 
-		if(verbal>1) fprintf(stdout, "selecting......\n");
+		if(verbal>2) fprintf(stdout, "selecting......\n");
 		if((nready=select(listenfd+1,&read_set,&write_set,NULL,NULL))<0){
 			fprintf(stderr, "select error\n");
 			exit(0);
 		}		
-		if(verbal>1) fprintf(stdout, "select done\n");
+		if(verbal>2) fprintf(stdout, "select done\n");
 
 		if(nready>0){
 			if(FD_ISSET(listenfd,&read_set)){
@@ -77,6 +77,7 @@ status_t* initDNSServer(int argc, char **argv){
 }
 
 int doIt_Read(int fd){
+	if(verbal > 1) printf("dns doit read\n");
 	socklen_t addrlen=sizeof(struct sockaddr_in);
 	struct sockaddr_in clientaddr;
 	char buf[MAXLINE];

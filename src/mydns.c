@@ -3,12 +3,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <proxy.h>
+#include "dns_packet.h"
 
 extern status_t *proxy_stat;
 
 int init_mydns(const char *dns_ip, unsigned int dns_port)
 {
-
+	return 0;
 }
 
 int resolve(const char *node, const char *service,
@@ -22,15 +23,15 @@ int resolve(const char *node, const char *service,
 
 	FD_ZERO(&read_fd);
 
-	addr.sin_family = AF_UNSPEC;
+	addr.sin_family = AF_INET;
 	addr.sin_addr.s_addr = inet_addr(proxy_stat->fakeIP);
 	addr.sin_port = htons(0);
 
-	dnsaddr.sin_family = AF_UNSPEC;
+	dnsaddr.sin_family = AF_INET;
 	dnsaddr.sin_addr.s_addr = inet_addr(proxy_stat->dnsIP);
-	dnsaddr.sin_port = htons(proxy_stat->dnsPORT);
+	dnsaddr.sin_port = htons(proxy_stat->dnsPort);
 
-	if((sock = socket(AF_UNSPEC, SOCK_DGRAM, IPPROTO_IP)) == -1){
+	if((sock = socket(AF_INET, SOCK_DGRAM, 0)) == -1){
 		printf("Failed creating dns socket\n");
 		exit(-1);
 	}
@@ -44,6 +45,8 @@ int resolve(const char *node, const char *service,
 	int len = 0;
 	construct_request_packet(node, buf, &len);
 
+	printf("send to dns server\n");
+
 	sendto(sock, buf, len, 0, (struct sockaddr *)&dnsaddr, sizeof(dnsaddr));
 
 	fdmax = sock;
@@ -54,15 +57,22 @@ int resolve(const char *node, const char *service,
 		exit(-1);
 	}
   
+	printf("-------------dns select done----------------\n ");
+
 	struct sockaddr_in from;
 	socklen_t fromlen = sizeof(from);
-	char buf[MAXLINE] = {0};
+
+	char buf2[MAXLINE] = {0};
 	char ip[MAXLINE] = {0};
 
-	int recvret = recvfrom(sock, buf, len, 0, (struct sockaddr *)&from, &fromlen);
+	int num = recvfrom(sock, buf2, MAXLINE, 0, (struct sockaddr *)&from, &fromlen);
 
-	parse_dns_response(buf, ip);
+	printf("recv %d bytes\n", num);
+
+	parse_dns_response(buf2, ip);
 	
+	printf("ip = %s\n", ip);
+
 	if(getaddrinfo(ip,service,NULL,res) != 0){
 		fprintf(stderr,"dns getaddrinfo error\n");
 		exit(-1);

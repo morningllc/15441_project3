@@ -23,7 +23,8 @@ typedef struct answer
 	unsigned int name:16;
 	unsigned int type:16;
 	unsigned int _class:16;
-	unsigned int ttl:32;
+	unsigned int ttl:16;
+	unsigned int ttl2:16;
 	unsigned int rdlength:16;
 	unsigned int ip1:8;
 	unsigned int ip2:8;
@@ -31,6 +32,8 @@ typedef struct answer
 	unsigned int ip4:8;
 }answer_t;
 
+int construct_request_packet(const char *node, char *buf, int *len);
 
+int parse_dns_response(char *buf, char *ip);
 
 #endif

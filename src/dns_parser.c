@@ -18,13 +18,17 @@ int parse(char *buf,size_t len,SA *addr){
 		parseRequestData(packet->data,name);
 
 		if(!strcmp(name,REQUESTNAME)){
-			buildResponseData(packet->data,data);
-			sendPacket=construct_response_packet(0,strlen(data),data,addr);
+			printf("right\n");
+			buildResponseData(packet->data,len-HEADER_LEN,data);
+	   	sendPacket=construct_response_packet(0,len-HEADER_LEN+16,data,addr);
 		}else{
-			sendPacket=construct_response_packet(3,strlen(packet->data),packet->data,addr);
+			sendPacket=construct_response_packet(3,len-HEADER_LEN,packet->data,addr);
 		}
 
 		if(sendPacket!=NULL){
+			char *tmp = sendPacket->data->data;
+			tmp+=len-HEADER_LEN;
+			fprintf(stdout,"%d.%d.%d.%d\n",(int)(*(tmp+12)),(int)(*(tmp+13)),(int)(*(tmp+14)),(int)(*(tmp+15)));
 			enqueue(DNS_stat->send_packets,sendPacket);
 		}
 
@@ -58,17 +62,18 @@ int parseRequestData(char *data,char *buf){
 	return 0;
 }
 
-int buildResponseData(char *request, char* ret){
+int buildResponseData(char *request,size_t len, char* ret){
 	if(verbal>1)
 		fprintf(stdout, "-----------in buildResponseData----------\n");	
 
-	size_t len = strlen(request);
-	strncpy(ret,request,len);
+	//size_t len = strlen(request);
+	memcpy(ret,request,len);
 	// char name[MAXLINE];
 	// sprintf(name,"%c%s%c%s%c%s%c%s%c",5,"video",2,"cs",3,"cmu",3,"edu",0);
-	unsigned short name = 0xc0c;
-	sprintf(ret+len,"%hu%hu%hu%hu%hu%c%c%c%c",name,1,1,0,4,1,0,0,1);
-	return 0;
+	//unsigned short name = 0xc00c;
+  sprintf(ret+len,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",0xc,0xc0,1,0,1,0,0,0,0,0,4,0,1,0,0,1);
+
+return 0;
 }
 
 
