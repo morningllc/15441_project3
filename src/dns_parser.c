@@ -81,6 +81,8 @@ return 0;
 
 ip_t *getIP(SA *addr){
 
+	// (struct sockaddr_in*)addr;
+
 	if(DNS_stat->robinFlag){
 		return getIP_Robin(DNS_stat->robin_list);
 	}else{

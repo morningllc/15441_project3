@@ -2,12 +2,8 @@
 #define _DSN_DIJ_H_
 
 #include "dns.h"
+#include "graph.h"
 
-typedef struct gnode_s{
-	char name[MAXLINE];
-	struct gnode_s *neighbors;
-	struct gnode_s *next;
-}gnode_t;
 
 typedef struct d_node_s{
 	char name[MAXLINE];
