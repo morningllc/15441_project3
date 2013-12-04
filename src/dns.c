@@ -4,6 +4,7 @@
 #include "dns_log.h"
 #include "dns_queue.h"
 #include "dns_robin.h"
+#include "graph.h"
 
 int verbal=2;
 status_t* DNS_stat;
@@ -76,10 +77,9 @@ status_t* initDNSServer(int argc, char **argv){
 		state->LSAs = argv[5];
 	}
 	state->send_packets=new_queue();
-	if(state->robinFlag)
+	if(state->robinFlag==0)
+	  state->lsaGraph = construct_graph(state->LSAs);
 		state->robin_list = initRobinList(state->serverFile);
-	else
-		state->robin_list = NULL; 
 
 	return state;
 }
