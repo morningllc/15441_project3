@@ -71,7 +71,7 @@ int buildResponseData(char *request,size_t len, char* ret){
 	// char name[MAXLINE];
 	// sprintf(name,"%c%s%c%s%c%s%c%s%c",5,"video",2,"cs",3,"cmu",3,"edu",0);
 	//unsigned short name = 0xc00c;
-  sprintf(ret+len,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",0xc,0xc0,1,0,1,0,0,0,0,0,4,0,1,0,0,1);
+  sprintf(ret+len,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",0xc0,0xc,1,0,1,0,0,0,0,0,4,0,1,0,0,1);
 
 return 0;
 }
