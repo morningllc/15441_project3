@@ -31,6 +31,7 @@
 typedef struct sockaddr SA;
 
 #include "dns_packet_server.h"
+#include "graph.h"
 
 typedef struct {
 	int robinFlag;	
@@ -42,6 +43,7 @@ typedef struct {
 	queue_t *send_packets;
 	send_packet_t *sending;
 	robin_list_t* robin_list;
+	gnode_t *lsaGraph;
 }status_t;
 
 

@@ -136,15 +136,17 @@ int open_serverfd(socket_t *pair)
   addr.sin_addr.s_addr = inet_addr(fake_ip);
   addr.sin_port=htons(rand_port);
 
-//  if((status = getaddrinfo(server_ip, server_port, &hints, &servinfo)) != 0){
-//		fprintf(stderr, "getaddrinfo error\n");
-//		return -1;
-//	}
-
+/*
+  if((status = getaddrinfo(server_ip, server_port, &hints, &servinfo)) != 0){
+		fprintf(stderr, "getaddrinfo error\n");
+		return -1;
+	}
+*/
  //  if((status = getaddrinfo(fake_ip, rand_port, &hints, &addr)) != 0){
 	// 	fprintf(stderr, "getaddrinfo error\n");
  //    return -1;
 	// }
+
 
 	if(resolve("video.cs.cmu.edu", "8080", NULL, &servinfo) != 0){
 		fprintf(stderr, "getaddrinfo error in proxy_process\n");

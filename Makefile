@@ -7,7 +7,9 @@ VPATH   = src
 CC 		= gcc
 CFLAGS  = -Wall -Werror -g -std=gnu99 -I$(INCLUDE)
 OBJS	= mydns.o proxy.o proxy_log.o proxy_bitrate.o proxy_parser.o proxy_socket.o proxy_queue.o proxy_process.o dns_packet.o
-DNSOBJS = dns.o dns_log.o dns_parser.o dns_packet_server.o dns_queue.o dns_robin.o dns_dijkstra.o
+
+DNSOBJS = graph.o dns.o dns_log.o dns_parser.o dns_packet_server.o dns_queue.o dns_robin.o dns_dijkstra.o
+
 
 DNSIP   = 5.0.0.1
 DNSPORT = 11212
