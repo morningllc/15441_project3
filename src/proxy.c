@@ -206,7 +206,7 @@ void checkSocketPairs(pool *p){
 }
 
 /**
- * 
+ * read data from client socket
  */
 void doIt_ReadClient(socket_t *pair){
 	if(verbal>1) fprintf(stdout, "-----------------doIt_ReadClient---------------\n");
@@ -239,13 +239,16 @@ void doIt_ReadClient(socket_t *pair){
 	}
 	
 }
-int test(){
-	return 1;
-}
-void updateBitRate()
-{
-}
+// int test(){
+// 	return 1;
+// }
+// void updateBitRate()
+// {
+// }
 
+/**
+ * read and process data from server
+ */
 void doIt_ReadServer(socket_t *pair)
 {
 	if(verbal>1) fprintf(stdout, "-----------------doIt_ReadServer---------------\n");
@@ -332,6 +335,9 @@ void doIt_ReadServer(socket_t *pair)
 	}
 }
 
+/**
+ * process the data from client 
+ */
 void doIt_Process(socket_t *pair)
 {
 	if(verbal) fprintf(stdout, "-----------------doIt_Process cfd=%d---------------\n",pair->client_fd);
@@ -359,6 +365,9 @@ void doIt_Process(socket_t *pair)
 	if(verbal) fprintf(stdout, "-----------------doIt_Process done---------------\n\n");
 }
 
+/**
+ * send data server from packets pool
+ */
 void doIt_SendToServer(socket_t *pair){
 	
 	if(verbal) fprintf(stdout, "-----------------doIt_SendToServer cfd=%d---------------\n",pair->client_fd);
@@ -379,6 +388,10 @@ void doIt_SendToServer(socket_t *pair){
 	if(verbal) fprintf(stdout, "-----------------doIt_SendToServer done : %d---------------\n\n",(int)n);	
 }
 
+
+/**
+ * send data to client 
+ */
 void doIt_SendToClient(socket_t *pair){
 	if(verbal) fprintf(stdout, "-----------------doIt_SendToClient cfd=%d---------------\n",pair->client_fd);
 	// pool *p=proxy_stat->p;
@@ -433,11 +446,18 @@ int open_listenfd(int port)
     }
     return listenfd;
 }
+
+/**
+ * close proxy server
+ */ 
 void closeProxy(){
     closeLogFile();
     exit(0);
 }
 
+/**
+ * get time in millisecond
+ */
 long long getSystemTime()
 {
 	struct timeb t;
