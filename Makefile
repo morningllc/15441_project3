@@ -10,7 +10,7 @@ OBJS	= mydns.o proxy.o proxy_log.o proxy_bitrate.o proxy_parser.o proxy_socket.o
 
 DNSOBJS = graph.o dns.o dns_log.o dns_parser.o dns_packet_server.o dns_queue.o dns_robin.o dns_dijkstra.o
 
-
+ALPHA   = 1
 DNSIP   = 5.0.0.1
 DNSPORT = 11212
 
@@ -26,10 +26,10 @@ nameserver: $(DNSOBJS)
 	$(CC) $(CFLAGS) $(DNSOBJS) -o $@ 
 
 run: proxy
-	./proxy log.txt 0.1 11223 1.0.0.1 $(DNSIP) $(DNSPORT) 3.0.0.1
+	./proxy log.txt $(ALPHA) 11223 1.0.0.1 $(DNSIP) $(DNSPORT) 3.0.0.1
 
 run2: proxy
-	./proxy log2.txt 0.1 11224 2.0.0.1 $(DNSIP) $(DNSPORT) 4.0.0.1
+	./proxy log2.txt $(ALPHA) 11224 2.0.0.1 $(DNSIP) $(DNSPORT) 4.0.0.1
 
 rundns1: nameserver
 	./nameserver -r dnslog.txt $(DNSIP) $(DNSPORT)  topos/topo1/topo1.servers topos/topo1/topo1.lsa

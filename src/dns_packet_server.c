@@ -5,7 +5,7 @@
 extern status_t *DNS_stat;
 extern int verbal;
 
-send_packet_t* construct_response_packet(uint8_t rcode,int len,char *data,SA *addr){
+send_packet_t* construct_response_packet(unsigned short id,uint8_t rcode,int len,char *data,SA *addr){
 	if(verbal>1)
 		fprintf(stdout, "--------------in construct_response_packet-------------\n");
 
@@ -24,7 +24,7 @@ send_packet_t* construct_response_packet(uint8_t rcode,int len,char *data,SA *ad
 
 	header_t *header=&(packet->data->header);
 
-	header->id=0;
+	header->id=id;
 	header->qr=0;
 	header->opcode=0;
 	header->aa=1;

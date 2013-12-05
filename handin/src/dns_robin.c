@@ -53,6 +53,7 @@ void closeFile(FILE *f){
 }
 
 ip_t *getIP_Robin(robin_list_t* list){
+	
 	if (list->size==0) return NULL;
 
 	ip_t *ret = &list->ptr->ip;

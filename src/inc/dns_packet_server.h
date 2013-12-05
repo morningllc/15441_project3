@@ -47,7 +47,7 @@ typedef struct{
 	packet_t *data;
 }send_packet_t;
 
-send_packet_t* construct_response_packet(uint8_t rcode,int len,char *data,SA *addr);
+send_packet_t* construct_response_packet(unsigned short id,uint8_t rcode,int len,char *data,SA *addr);
 void free_send_packet(send_packet_t *p);
 
 #endif
