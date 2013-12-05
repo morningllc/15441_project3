@@ -6,7 +6,7 @@
 #include "dns_robin.h"
 #include "graph.h"
 
-int verbal=2;
+int verbal=1;
 status_t* DNS_stat;
 
 int main(int argc, char **argv){

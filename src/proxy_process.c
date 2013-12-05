@@ -162,6 +162,10 @@ int open_serverfd(socket_t *pair)
 		return -1;
 	}
 
+	struct sockaddr_in tmpaddr =  *((struct sockaddr_in*)servinfo->ai_addr);
+ 	char* serverIP = inet_ntoa(tmpaddr.sin_addr);
+ 	strcpy(pair->server_addr,serverIP);
+ 	
 	freeaddrinfo(servinfo);
 
   pair->server_fd = sock;

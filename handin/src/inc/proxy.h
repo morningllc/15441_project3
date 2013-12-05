@@ -44,6 +44,7 @@ typedef struct{
 	int client_fd;
 	int server_fd;	
 	char *remote_addr;
+	char server_addr[20];
 
 	char host[MAXLINE];
 	int host_port;

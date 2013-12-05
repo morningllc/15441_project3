@@ -8,6 +8,7 @@ extern status_t *DNS_stat;
 extern int verbal;
 
 void checkbuf(char *buf,int len){
+	if(verbal<=2) return;
 	fprintf(stdout, "\n***********len:%d - %p**************\n",len,buf);
 	for (int i=0;i<len;i++){
 		
@@ -123,11 +124,11 @@ int buildResponseData(char *request,size_t len, char* ret,char *clientIP){
 
 	answer_t answer;
 	answer.name=0x0cc0;
-  	answer.type=1;
-  	answer._class=1;
+  	answer.type=0x100;
+  	answer._class=0x100;
 	answer.ttl=0;
 	answer.ttl2=0;
-  	answer.rdlength=4;
+  	answer.rdlength=0x400;
   	answer.ip1=ip->ip[0];
   	answer.ip2=ip->ip[1];
   	answer.ip3=ip->ip[2];

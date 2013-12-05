@@ -302,7 +302,7 @@ void doIt_ReadServer(socket_t *pair)
 				addData(pair->buf_send_client, pair->content_buf, pair->contentlen);
 			}
 			else if(req->request_type == TYPE_VIDEO){
-				update_bitrate(req->send_time, getSystemTime(), pair->contentlen, req->request_bitrate, req->chunk_name, pair->remote_addr);
+				update_bitrate(req->send_time, getSystemTime(), pair->contentlen, req->request_bitrate, req->chunk_name, pair->server_addr);
 				addData(pair->buf_send_client, pair->content_buf, pair->contentlen);
 			}
 			else{

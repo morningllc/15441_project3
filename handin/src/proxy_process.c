@@ -43,7 +43,7 @@ int buildRequestContent(socket_t *pair){
 	 pstate_t *label = (pstate_t *)malloc(sizeof(pstate_t));
 	 label->request_type=pair->request_type;
 	 if(pair->request_type==TYPE_VIDEO){
-		 label->send_time=getSystemTime()-100;
+		 label->send_time=getSystemTime();
 		 sprintf(label->chunk_name,"Seg%d-Frag%d",pair->seg_num,pair->frag_num);
 		 label->request_bitrate=proxy_stat->bitrate;
 	 }
@@ -162,6 +162,10 @@ int open_serverfd(socket_t *pair)
 		return -1;
 	}
 
+	struct sockaddr_in tmpaddr =  *((struct sockaddr_in*)servinfo->ai_addr);
+ 	char* serverIP = inet_ntoa(tmpaddr.sin_addr);
+ 	strcpy(pair->server_addr,serverIP);
+ 	
 	freeaddrinfo(servinfo);
 
   pair->server_fd = sock;

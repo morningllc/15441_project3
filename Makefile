@@ -29,7 +29,7 @@ run: proxy
 	./proxy log.txt $(ALPHA) 11223 1.0.0.1 $(DNSIP) $(DNSPORT)
 
 run2: proxy
-	./proxy log2.txt $(ALPHA) 11224 2.0.0.1 $(DNSIP) $(DNSPORT)
+	./proxy log2.txt $(ALPHA) 11224 2.0.0.1 $(DNSIP) $(DNSPORT) 3.0.0.1
 
 rundns1: nameserver
 	./nameserver -r dnslog.txt $(DNSIP) $(DNSPORT)  topos/topo1/topo1.servers topos/topo1/topo1.lsa
