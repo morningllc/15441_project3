@@ -11,7 +11,7 @@ void update_bitrate(long long t1, long long t2, int size, int bit, char* chunkna
 {
 	float alpha = proxy_stat->alpha;
 	float t = (float)((size)/((t2-t1))) * 8000;
-	proxy_stat->t = alpha*t + (1-alpha)*proxy_stat->t;
+	proxy_stat->t = alpha*t + (1.0-alpha)*proxy_stat->t;
 	
 	if(t<0){
 	  printf("size = %d\n", size);
@@ -39,7 +39,7 @@ void update_bitrate(long long t1, long long t2, int size, int bit, char* chunkna
 		printf("t2-t1 = %lf\n",(float)(t2-t1)/1000 );
 		exit(0);
 	}
-
+	fprintf(stdout,"%.2f    %.2f   %d\n",t/1000,proxy_stat->t/1000,bit);
 	logWrite((float)(t2-t1)/1000, t/1000, proxy_stat->t/1000, bit, client_ip, chunkname);
 }
 

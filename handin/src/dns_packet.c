@@ -13,7 +13,7 @@ int construct_request_packet(const char *node, char *buf, int *len)
 	memcpy(buf, &header, header_len);
 
 	int question_len = 22;
-	sprintf(buf+header_len,"%c%s%c%s%c%s%c%s%c%hu%hu",5,"video",2,"cs",3,"cmu",3,"edu",0,1,1);
+	sprintf(buf+header_len,"%c%s%c%s%c%s%c%s%c%c%c%c%c",5,"video",2,"cs",3,"cmu",3,"edu",0,0,1,0,1);
 
 	*len = header_len+question_len;
 	return 0;
