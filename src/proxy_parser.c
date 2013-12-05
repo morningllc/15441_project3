@@ -123,6 +123,7 @@ int parseServerHeader(socket_t *pair)
 
 int parseManifestFile(char *buf)
 {
+/*
   int bitrate = 0;
 	char *ptr = NULL;
 
@@ -145,7 +146,12 @@ int parseManifestFile(char *buf)
 		return -1;
   sscanf(ptr, "bitrate=\"%d\"",&bitrate);
   proxy_stat->bitrates[3] = bitrate;
+*/
 
+	proxy_stat->bitrates[0] = 10;
+	proxy_stat->bitrates[1] = 100;
+	proxy_stat->bitrates[2] = 500;
+	proxy_stat->bitrates[3] = 1000;
 	proxy_stat->bitrate = proxy_stat->bitrates[0];
 	proxy_stat->t = (float)proxy_stat->bitrates[0];
 
