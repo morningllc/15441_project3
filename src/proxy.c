@@ -58,6 +58,9 @@ int main(int argc, char **argv){
     return 0;
 }
 
+/**
+ * initialize proxy
+ */
 status_t* initProxy(int argc, char **argv){
 	if(argc<7||argc>8){
 		fprintf(stderr,USAGE);
@@ -82,6 +85,7 @@ status_t* initProxy(int argc, char **argv){
 
 	return proxy;
 }
+
 /**
  *	initialize pool
  */
@@ -100,13 +104,16 @@ void initPool(pool *p){
 
 
 /**
- * add two listen fds to pool
+ * add listen fd to pool
  */
 void setPool(int httpfd,pool *p){
 	p->maxfd=httpfd;
 	FD_SET(httpfd,&p->read_set);
 }
 
+/**
+ * add a client-server pair into pool
+ */
 void addSocketPair(int connfd,pool *p,struct sockaddr_in clientaddr){
 	if(verbal)
 		fprintf(stdout, "--->in add_pair\n");
@@ -140,6 +147,9 @@ void addSocketPair(int connfd,pool *p,struct sockaddr_in clientaddr){
 		fprintf(stdout, "add_pair done cfd=%d\n",connfd);
 }
 
+/**
+ * check all pairs to if anyone is ready to send or receive
+ */
 void checkSocketPairs(pool *p){ 
 	if(verbal>1) fprintf(stdout, "--->in check_pair\n");
 	
@@ -195,7 +205,9 @@ void checkSocketPairs(pool *p){
 		fprintf(stdout, "check_pair done\n");
 }
 
-/*read data*/
+/**
+ * 
+ */
 void doIt_ReadClient(socket_t *pair){
 	if(verbal>1) fprintf(stdout, "-----------------doIt_ReadClient---------------\n");
 	int readn;
