@@ -6,7 +6,7 @@
 #include "dns_robin.h"
 #include "graph.h"
 
-int verbal=2;
+int verbal=0;
 status_t* DNS_stat;
 
 int main(int argc, char **argv){
@@ -51,6 +51,9 @@ int main(int argc, char **argv){
 	return 0;
 }
 
+/**
+ * initialize DNS server
+ */
 status_t* initDNSServer(int argc, char **argv){
 	if(argc<6||argc>7){
 		fprintf(stderr,USAGE);
@@ -83,6 +86,9 @@ status_t* initDNSServer(int argc, char **argv){
 	return state;
 }
 
+/**
+ * process inbound data
+ */
 int doIt_Read(int fd){
 	if(verbal > 1) printf("dns doit read\n");
 	socklen_t addrlen=sizeof(struct sockaddr_in);
@@ -100,6 +106,10 @@ int doIt_Read(int fd){
 	return 0;
 }
 
+/**
+ * process outbound data
+ * send a packet from packets queue
+ */
 int doIt_Send(int fd){
 	send_packet_t *send = DNS_stat->sending;
 	if(send != NULL){
@@ -116,7 +126,9 @@ int doIt_Send(int fd){
 	return 0;
 }
 
-
+/**
+ * open DNS server listen socket
+ */
 int open_listenfd(char* ip, int port) 
 {
     int listenfd, optval=1;
@@ -144,15 +156,12 @@ int open_listenfd(char* ip, int port)
     	close(listenfd);
     	return -1;
     }
-
-    // if (listen(listenfd, LISTENQ) < 0){
-    // 	close(listenfd);
-    // 	return -1;
-    // }
     return listenfd;
 }
 
-
+/**
+ * close DNS server
+ */
 void closeDNSServer(){
 	closeLogFile();
     exit(0);

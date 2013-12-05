@@ -58,6 +58,9 @@ int main(int argc, char **argv){
     return 0;
 }
 
+/**
+ * initialize proxy
+ */
 status_t* initProxy(int argc, char **argv){
 	if(argc<7||argc>8){
 		fprintf(stderr,USAGE);
@@ -82,6 +85,7 @@ status_t* initProxy(int argc, char **argv){
 
 	return proxy;
 }
+
 /**
  *	initialize pool
  */
@@ -100,13 +104,16 @@ void initPool(pool *p){
 
 
 /**
- * add two listen fds to pool
+ * add listen fd to pool
  */
 void setPool(int httpfd,pool *p){
 	p->maxfd=httpfd;
 	FD_SET(httpfd,&p->read_set);
 }
 
+/**
+ * add a client-server pair into pool
+ */
 void addSocketPair(int connfd,pool *p,struct sockaddr_in clientaddr){
 	if(verbal)
 		fprintf(stdout, "--->in add_pair\n");
@@ -140,6 +147,9 @@ void addSocketPair(int connfd,pool *p,struct sockaddr_in clientaddr){
 		fprintf(stdout, "add_pair done cfd=%d\n",connfd);
 }
 
+/**
+ * check all pairs to if anyone is ready to send or receive
+ */
 void checkSocketPairs(pool *p){ 
 	if(verbal>1) fprintf(stdout, "--->in check_pair\n");
 	
@@ -195,7 +205,9 @@ void checkSocketPairs(pool *p){
 		fprintf(stdout, "check_pair done\n");
 }
 
-/*read data*/
+/**
+ * read data from client socket
+ */
 void doIt_ReadClient(socket_t *pair){
 	if(verbal>1) fprintf(stdout, "-----------------doIt_ReadClient---------------\n");
 	int readn;
@@ -227,13 +239,10 @@ void doIt_ReadClient(socket_t *pair){
 	}
 	
 }
-int test(){
-	return 1;
-}
-void updateBitRate()
-{
-}
 
+/**
+ * read and process data from server
+ */
 void doIt_ReadServer(socket_t *pair)
 {
 	if(verbal>1) fprintf(stdout, "-----------------doIt_ReadServer---------------\n");
@@ -258,7 +267,6 @@ void doIt_ReadServer(socket_t *pair)
 			pair->left = 0;
 			pair->contentlen = 0;
 			pair->server_stat = HEADER;
-			test();
 			return;
 		}
 		
@@ -302,7 +310,7 @@ void doIt_ReadServer(socket_t *pair)
 				addData(pair->buf_send_client, pair->content_buf, pair->contentlen);
 			}
 			else if(req->request_type == TYPE_VIDEO){
-				update_bitrate(req->send_time, getSystemTime(), pair->contentlen, req->request_bitrate, req->chunk_name, pair->remote_addr);
+				update_bitrate(req->send_time, getSystemTime(), pair->contentlen, req->request_bitrate, req->chunk_name, pair->server_addr);
 				addData(pair->buf_send_client, pair->content_buf, pair->contentlen);
 			}
 			else{
@@ -320,6 +328,9 @@ void doIt_ReadServer(socket_t *pair)
 	}
 }
 
+/**
+ * process the data from client 
+ */
 void doIt_Process(socket_t *pair)
 {
 	if(verbal) fprintf(stdout, "-----------------doIt_Process cfd=%d---------------\n",pair->client_fd);
@@ -347,6 +358,9 @@ void doIt_Process(socket_t *pair)
 	if(verbal) fprintf(stdout, "-----------------doIt_Process done---------------\n\n");
 }
 
+/**
+ * send data server from packets pool
+ */
 void doIt_SendToServer(socket_t *pair){
 	
 	if(verbal) fprintf(stdout, "-----------------doIt_SendToServer cfd=%d---------------\n",pair->client_fd);
@@ -367,6 +381,10 @@ void doIt_SendToServer(socket_t *pair){
 	if(verbal) fprintf(stdout, "-----------------doIt_SendToServer done : %d---------------\n\n",(int)n);	
 }
 
+
+/**
+ * send data to client 
+ */
 void doIt_SendToClient(socket_t *pair){
 	if(verbal) fprintf(stdout, "-----------------doIt_SendToClient cfd=%d---------------\n",pair->client_fd);
 	// pool *p=proxy_stat->p;
@@ -421,11 +439,18 @@ int open_listenfd(int port)
     }
     return listenfd;
 }
+
+/**
+ * close proxy server
+ */ 
 void closeProxy(){
     closeLogFile();
     exit(0);
 }
 
+/**
+ * get time in millisecond
+ */
 long long getSystemTime()
 {
 	struct timeb t;

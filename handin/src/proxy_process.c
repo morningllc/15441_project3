@@ -3,8 +3,14 @@
 #include "proxy_socket.h"
 #include "proxy_parser.h"
 #include "mydns.h"
+
 extern status_t *proxy_stat;
 extern int verbal;
+
+
+/**
+ * build request content for server
+ */ 
 int buildRequestContent(socket_t *pair){
 	 char request[BUFFERSIZE]={0};
 	 char header[BUFFERSIZE]={0};
@@ -51,6 +57,11 @@ int buildRequestContent(socket_t *pair){
 	 
 	 return 0;
 }
+
+/**
+ * build request content for server 
+ * if client requests for manifest file
+ */
 int buildManifestContent(socket_t *pair,char *header){
 
 	char request[BUFFERSIZE];
@@ -91,6 +102,10 @@ int buildManifestContent(socket_t *pair,char *header){
 
 	 return 0;
 }
+
+/**
+ * build request header
+ */ 
 int buildRequestHeader(socket_t *pair, char* header){
 	char tmpbuf[BUFFERSIZE]={0};
 	ssize_t n;
@@ -112,6 +127,10 @@ int buildRequestHeader(socket_t *pair, char* header){
 	return 0;
 }
 
+
+/**
+ * open server socket 
+ */
 int open_serverfd(socket_t *pair)
 {
   char *fake_ip = proxy_stat->fakeIP;
@@ -162,6 +181,10 @@ int open_serverfd(socket_t *pair)
 		return -1;
 	}
 
+	struct sockaddr_in tmpaddr =  *((struct sockaddr_in*)servinfo->ai_addr);
+ 	char* serverIP = inet_ntoa(tmpaddr.sin_addr);
+ 	strcpy(pair->server_addr,serverIP);
+ 	
 	freeaddrinfo(servinfo);
 
   pair->server_fd = sock;
@@ -169,7 +192,9 @@ int open_serverfd(socket_t *pair)
 	return 1;
 }
 
-
+/**
+ * add specific data to buffer
+ */
 int addData(buffer *b,void* data,size_t len){
 	if(verbal)
 	fprintf(stdout, "--->addData\n");

@@ -25,6 +25,9 @@ void closeLogFile() {
 		}
 }
 
+/**
+ * write into log file
+ */
 void logWrite(char* clientIP,char* query,char* response){
 	
 	if(logFile!=NULL){

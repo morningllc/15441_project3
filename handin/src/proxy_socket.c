@@ -4,6 +4,7 @@
 
 extern status_t *proxy_stat;
 extern int verbal;
+
 /*buffer manipulations*/
 buffer *initBuffer(){
 	buffer *b;
@@ -30,10 +31,6 @@ void freeBuffer(buffer *b){
 buffer* resetBuffer(buffer *b){
 	freeBuffer(b);
 	return initBuffer();
-	// if((b=initBuffer())==NULL){
-	// 	return -1;
-	// }
-	// return 0;
 }
 int initSocketBuffer(socket_t *s){
 	if((s->buf_server=initBuffer())==NULL){
@@ -64,6 +61,11 @@ int resetSocketBuffer(socket_t *s){
 	cleanSocketBuffer(s);
 	return initSocketBuffer(s);
 }
+/* END */
+
+/**
+ * initialize client-server pair
+ */
 void initSocketPair(socket_t *pair){
  	pair->client_fd=-1;
  	pair->server_fd=-1;
@@ -96,6 +98,10 @@ void initSocketPair(socket_t *pair){
 	pair->buf_send_client=NULL;
 	pair->buf_send_server=NULL;
  }
+
+ /**
+  * reset client-server pair
+  */
 void resetSocketPair(socket_t *s){
 	//fprintf(stdout, "==>in resetClient\n");
 	if(s->requestQueue!=NULL){
@@ -111,7 +117,7 @@ void resetSocketPair(socket_t *s){
 	initSocketPair(s);
 	//fprintf(stdout, "==>in resetClient cfd=%d\n",s->client_fd);
 }
-/*END*/
+
 
 /*read functions*/
 

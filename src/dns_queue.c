@@ -66,6 +66,9 @@ void *dequeue(queue_t *queue)
   } 
 }
 
+/**
+ * free queue (not data)
+ */
 void free_queue(queue_t *queue)
 {
   while(queue->size != 0){
@@ -74,6 +77,9 @@ void free_queue(queue_t *queue)
   free(queue);
 }
 
+/**
+ * add data into priority queue
+ */
 int enqueuePQ(queue_t *queue, void *data,int weight)
 {
   assert(queue != NULL);

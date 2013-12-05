@@ -4,6 +4,10 @@
 
 extern status_t *proxy_stat;
 extern int verbal;
+
+/**
+ * for debug
+ */
 void checkBuffer(buffer *b,char *name){
 	if (verbal==0) return;
 	fprintf(stdout, "-------->check buf:%s<---------\n%s\n",name,b->buf);
@@ -11,6 +15,10 @@ void checkBuffer(buffer *b,char *name){
 		(int)b->size,(int)b->length,(int)b->count,
 		b->ptr,b->buf);
 }
+
+/**
+ * parse http request message from client
+ */
 int parseClientRequest(socket_t *pair){	
 
 	size_t n;
@@ -30,7 +38,9 @@ int parseClientRequest(socket_t *pair){
 	return 0;
 }
 
-
+/**
+ * parse method line of request
+ */
 int parseMethod(socket_t *pair,char *buf){
 	char method[MAXLINE],uri[MAXLINE];
 	char protocol[MAXLINE],host[MAXLINE],path[MAXLINE];
@@ -103,6 +113,7 @@ int parseMethod(socket_t *pair,char *buf){
 
 	return 0;
 }
+
 
 int parseServerHeader(socket_t *pair)
 {

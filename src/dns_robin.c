@@ -3,6 +3,10 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+/**
+ * construct a server list from file
+ */
 robin_list_t* initRobinList(char *filename){
 	FILE *file;
 	char line[MAXLINE];
@@ -45,6 +49,9 @@ robin_list_t* initRobinList(char *filename){
 	return list;
 }
 
+/**
+ * close file safely
+ */
 void closeFile(FILE *f){
 	if(f!=NULL){
 		fclose(f);
@@ -52,6 +59,9 @@ void closeFile(FILE *f){
 	}
 }
 
+/**
+ * get server IP by round robin method
+ */
 ip_t *getIP_Robin(robin_list_t* list){
 	
 	if (list->size==0) return NULL;
