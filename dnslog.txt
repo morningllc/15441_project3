@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 1386203079 1.0.0.1 video.cs.cmu.edu 4.0.0.1
 1386203095 1.0.0.1 video.cs.cmu.edu 4.0.0.1
 1386203096 1.0.0.1 video.cs.cmu.edu 4.0.0.1
 1386203227 1.0.0.1 video.cs.cmu.edu 4.0.0.1
+=======
+1386228528 5.0.0.1 video.cs.cmu.edu 3.0.0.1
+>>>>>>> f9a8a8ff1e0361dfd10588600bb8cc73542e5ac0
