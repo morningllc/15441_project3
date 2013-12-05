@@ -7,10 +7,25 @@
 extern status_t *DNS_stat;
 extern int verbal;
 
+void checkbuf(char *buf,int len){
+	fprintf(stdout, "\n***********len:%d - %p**************\n",len,buf);
+	for (int i=0;i<len;i++){
+		
+		if(i%2 == 0) 
+			fprintf(stdout, " ");
+		if(i%16 == 0)
+			fprintf(stdout, "\n");
+
+		fprintf(stdout, "%2x",*(uint8_t *)(buf+i));
+		
+	}
+	fprintf(stdout, "\n*************************\n\n");
+}
+
 int parse(char *buf,size_t len,SA *addr){
 	if(verbal>1)
 		fprintf(stdout, "--------------in parse-------------\n");
-	
+	checkbuf(buf,len);
 	struct sockaddr_in tmpaddr =  *((struct sockaddr_in*)addr);
  	char* clientIP = inet_ntoa(tmpaddr.sin_addr);
 
@@ -22,17 +37,37 @@ int parse(char *buf,size_t len,SA *addr){
 	unsigned short requestID = packet->header.id;
 	// if(packet->header.qr==1){
 		send_packet_t *sendPacket;
+
+		// int tt = len-HEADER_LEN;
+		// fprintf(stdout, "id: %d\n",packet->header.id);
+		// fprintf(stdout, "qr: %d\n",packet->header.qr);
+		// fprintf(stdout, "opcode: %d\n",packet->header.opcode);
+		// fprintf(stdout, "aa: %d\n",packet->header.aa);
+		// fprintf(stdout, "tc: %d\n",packet->header.tc);
+		// fprintf(stdout, "rd: %d\n",packet->header.rd);
+		// fprintf(stdout, "ra: %d\n",packet->header.ra);
+		// fprintf(stdout, "z: %d\n",packet->header.z);
+		// fprintf(stdout, "qdcount: %d\n",packet->header.qdcount);
+		// fprintf(stdout, "ancount: %d\n",packet->header.ancount);
+		// fprintf(stdout, "nscount: %d\n",packet->header.nscount);
+		// fprintf(stdout, "arcount: %d\n",packet->header.arcount);
+		// fprintf(stdout, "name: %s\n",packet->data);
+		// fprintf(stdout, "qtype: %d\n",(*(unsigned short *)(packet->data+strlen(packet->data)+0)));
+		// fprintf(stdout, "qclass: %d\n",(*(unsigned short *)(packet->data+strlen(packet->data)+2)));
+		// fprintf(stdout, "tt: %d l-h: %d\n",tt,(int)strlen(packet->data)+3);
 		parseRequestData(packet->data,name);
 		fprintf(stdout,"name: %s\n",name);
 		if(!strcmp(name,REQUESTNAME)){
 			int datalen=buildResponseData(packet->data,len-HEADER_LEN,data,clientIP);
 	   		sendPacket=construct_response_packet(requestID,0,datalen,data,addr);
+	   		checkbuf((char *)(sendPacket->data),datalen+HEADER_LEN);
 		}else{
 			logWrite(clientIP,name,"0.0.0.0");
 			sendPacket=construct_response_packet(requestID,3,len-HEADER_LEN,packet->data,addr);
 		}
 
 		if(sendPacket!=NULL){
+
 			char *tmp = sendPacket->data->data;
 			tmp+=len-HEADER_LEN;
 			fprintf(stdout,"%d.%d.%d.%d\n",(int)(*(tmp+12)),(int)(*(tmp+13)),(int)(*(tmp+14)),(int)(*(tmp+15)));
@@ -86,8 +121,21 @@ int buildResponseData(char *request,size_t len, char* ret,char *clientIP){
 
 	logWrite(clientIP,REQUESTNAME,ip->ip_str);
 
-    sprintf(ret+len,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
-    	0xc,0xc0,1,0,1,0,0,0,0,0,4,0,ip->ip[0],ip->ip[1],ip->ip[2],ip->ip[3]);
+	answer_t answer;
+	answer.name=0x0cc0;
+  	answer.type=1;
+  	answer._class=1;
+	answer.ttl=0;
+	answer.ttl2=0;
+  	answer.rdlength=4;
+  	answer.ip1=ip->ip[0];
+  	answer.ip2=ip->ip[1];
+  	answer.ip3=ip->ip[2];
+  	answer.ip4=ip->ip[3];
+
+    // sprintf(ret+len,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+    // 	0xc,0xc0,1,0,1,0,0,0,0,0,4,0,ip->ip[0],ip->ip[1],ip->ip[2],ip->ip[3]);
+    memcpy(ret+len,&answer,sizeof(answer_t));
 
 	return len+16;
 }
