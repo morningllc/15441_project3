@@ -7,6 +7,9 @@
 extern status_t *DNS_stat;
 extern int verbal;
 
+/**
+ * this function used for debug
+ */
 void checkbuf(char *buf,int len){
 	if(verbal<=2) return;
 	fprintf(stdout, "\n***********len:%d - %p**************\n",len,buf);
@@ -23,6 +26,9 @@ void checkbuf(char *buf,int len){
 	fprintf(stdout, "\n*************************\n\n");
 }
 
+/**
+ * parse dns request
+ */
 int parse(char *buf,size_t len,SA *addr){
 	if(verbal>1)
 		fprintf(stdout, "--------------in parse-------------\n");
@@ -36,55 +42,35 @@ int parse(char *buf,size_t len,SA *addr){
 	packet_t *packet = (packet_t *) buf;
 
 	unsigned short requestID = packet->header.id;
-	// if(packet->header.qr==1){
-		send_packet_t *sendPacket;
+	send_packet_t *sendPacket;
+	parseRequestData(packet->data,name);
+	fprintf(stdout,"name: %s\n",name);
+	if(!strcmp(name,REQUESTNAME)){
+		int datalen=buildResponseData(packet->data,len-HEADER_LEN,data,clientIP);
+   		sendPacket=construct_response_packet(requestID,0,datalen,data,addr);
+   		checkbuf((char *)(sendPacket->data),datalen+HEADER_LEN);
+	}else{
+		logWrite(clientIP,name,"0.0.0.0");
+		sendPacket=construct_response_packet(requestID,3,len-HEADER_LEN,packet->data,addr);
+	}
 
-		// int tt = len-HEADER_LEN;
-		// fprintf(stdout, "id: %d\n",packet->header.id);
-		// fprintf(stdout, "qr: %d\n",packet->header.qr);
-		// fprintf(stdout, "opcode: %d\n",packet->header.opcode);
-		// fprintf(stdout, "aa: %d\n",packet->header.aa);
-		// fprintf(stdout, "tc: %d\n",packet->header.tc);
-		// fprintf(stdout, "rd: %d\n",packet->header.rd);
-		// fprintf(stdout, "ra: %d\n",packet->header.ra);
-		// fprintf(stdout, "z: %d\n",packet->header.z);
-		// fprintf(stdout, "qdcount: %d\n",packet->header.qdcount);
-		// fprintf(stdout, "ancount: %d\n",packet->header.ancount);
-		// fprintf(stdout, "nscount: %d\n",packet->header.nscount);
-		// fprintf(stdout, "arcount: %d\n",packet->header.arcount);
-		// fprintf(stdout, "name: %s\n",packet->data);
-		// fprintf(stdout, "qtype: %d\n",(*(unsigned short *)(packet->data+strlen(packet->data)+0)));
-		// fprintf(stdout, "qclass: %d\n",(*(unsigned short *)(packet->data+strlen(packet->data)+2)));
-		// fprintf(stdout, "tt: %d l-h: %d\n",tt,(int)strlen(packet->data)+3);
-		parseRequestData(packet->data,name);
-		fprintf(stdout,"name: %s\n",name);
-		if(!strcmp(name,REQUESTNAME)){
-			int datalen=buildResponseData(packet->data,len-HEADER_LEN,data,clientIP);
-	   		sendPacket=construct_response_packet(requestID,0,datalen,data,addr);
-	   		checkbuf((char *)(sendPacket->data),datalen+HEADER_LEN);
-		}else{
-			logWrite(clientIP,name,"0.0.0.0");
-			sendPacket=construct_response_packet(requestID,3,len-HEADER_LEN,packet->data,addr);
-		}
+	if(sendPacket!=NULL){
 
-		if(sendPacket!=NULL){
+		char *tmp = sendPacket->data->data;
+		tmp+=len-HEADER_LEN;
+		fprintf(stdout,"%d.%d.%d.%d\n",(int)(*(tmp+12)),(int)(*(tmp+13)),(int)(*(tmp+14)),(int)(*(tmp+15)));
+		enqueue(DNS_stat->send_packets,sendPacket);
+	}
 
-			char *tmp = sendPacket->data->data;
-			tmp+=len-HEADER_LEN;
-			fprintf(stdout,"%d.%d.%d.%d\n",(int)(*(tmp+12)),(int)(*(tmp+13)),(int)(*(tmp+14)),(int)(*(tmp+15)));
-			enqueue(DNS_stat->send_packets,sendPacket);
-		}
-
-		if(verbal>1)
-		fprintf(stdout, "--------------in parse - done-------------\n");
-		return 0;
-	// }
-	// if(verbal>1)
-	// 	fprintf(stderr, "request is not a query\n");
-	// return -1;
+	if(verbal>1)
+	fprintf(stdout, "--------------in parse - done-------------\n");
+	return 0;
 
 }
 
+/**
+ * parse the data part of dns request
+ */
 int parseRequestData(char *data,char *buf){
 	if(verbal>1)
 		fprintf(stdout, "-----------in parseRequestData----------\n");
@@ -105,15 +91,15 @@ int parseRequestData(char *data,char *buf){
 	return 0;
 }
 
+/**
+ * build the data part of response
+ */
 int buildResponseData(char *request,size_t len, char* ret,char *clientIP){
 	if(verbal>1)
 		fprintf(stdout, "-----------in buildResponseData----------\n");	
 	memcpy(ret,request,len);
 
-	
-
 	ip_t *ip=getIP(clientIP);
-
 
 	if(ip==NULL){
 		logWrite(clientIP,REQUESTNAME,"");
@@ -137,10 +123,13 @@ int buildResponseData(char *request,size_t len, char* ret,char *clientIP){
     // sprintf(ret+len,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
     // 	0xc,0xc0,1,0,1,0,0,0,0,0,4,0,ip->ip[0],ip->ip[1],ip->ip[2],ip->ip[3]);
     memcpy(ret+len,&answer,sizeof(answer_t));
-
 	return len+16;
 }
 
+/**
+ * get ip address of server using 
+ * round robin or LSAs method
+ */
 ip_t *getIP(char *clientIP){
 
 	if(verbal>1)

@@ -4,6 +4,9 @@
 
 extern int verbal;
 
+/**
+ * following check functions are for debug
+ */
 void checkGraph(gnode_t* graph){
 	fprintf(stdout, "\n**********checkGraph**********\n");
 	gnode_t *ptr=graph;
@@ -31,7 +34,6 @@ void checkQ(queue_t *Q){
 	fprintf(stdout, "*********************************\n\n");
 
 }
-
 void checkL(d_node_t *L){
 	fprintf(stdout, "\n**********checkL**********\n");
 	d_node_t* ptr = L;
@@ -43,8 +45,11 @@ void checkL(d_node_t *L){
 	fprintf(stdout, "*********************************\n\n");
 
 }
+/*END*/
 
-
+/**
+ * implement dijkstra algorithm to find ip address
+ */
 ip_t *getIP_LSAs(gnode_t* graph, char* src, robin_list_t* servers){
 	if(verbal>2) checkGraph(graph);
 	if(verbal>1)
@@ -96,6 +101,9 @@ ip_t *getIP_LSAs(gnode_t* graph, char* src, robin_list_t* servers){
 	return ret;
 }
 
+/**
+ * check if a node has been visited
+ */
 int containNode(char* name, d_node_t *list){
 	if(verbal>2)
 		fprintf(stdout, "-----in containNode : %s-----\n",name);
@@ -116,6 +124,9 @@ int containNode(char* name, d_node_t *list){
 
 }
 
+/**
+ * find a node in graph by name string
+ */
 gnode_t *findGraphNode(char *name,gnode_t* graph){
 	if(verbal>2)
 		fprintf(stdout, "-----in findGraphNode-----\n");
@@ -129,6 +140,9 @@ gnode_t *findGraphNode(char *name,gnode_t* graph){
 	return NULL;
 }
 
+/**
+ * check if a node is a servr
+ */ 
 ip_t *isServer(char *name,robin_list_t* list){
 	if(verbal>2)
 		fprintf(stdout, "-----in isServer: %s-----\n",name);
@@ -140,6 +154,9 @@ ip_t *isServer(char *name,robin_list_t* list){
 	return NULL;
 }
 
+/**
+ * add all neighbors of a node into priority queue
+ */
 void addToPQ(gnode_t *neighbors,int weight,queue_t *PQ){
 	if(verbal>2)
 		fprintf(stdout, "-----in addToPQ-----\n");
@@ -156,6 +173,10 @@ void addToPQ(gnode_t *neighbors,int weight,queue_t *PQ){
 	}
 
 }
+
+/**
+ * free the PQ and visit list
+ */
 void freeALL(queue_t *PQ,d_node_t *list){
 	if(verbal>2)
 		fprintf(stdout, "-----in freeALL-----\n");
