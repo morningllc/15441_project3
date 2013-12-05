@@ -26,7 +26,7 @@ nameserver: $(DNSOBJS)
 	$(CC) $(CFLAGS) $(DNSOBJS) -o $@ 
 
 run: proxy
-	./proxy log.txt 0.1 11223 1.0.0.1 $(DNSIP) $(DNSPORT) 3.0.0.1
+	./proxy log.txt 0.1 11223 1.0.0.1 $(DNSIP) $(DNSPORT) 
 
 run2: proxy
 	./proxy log2.txt 0.1 11224 2.0.0.1 $(DNSIP) $(DNSPORT) 4.0.0.1

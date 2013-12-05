@@ -114,43 +114,37 @@ int buildRequestHeader(socket_t *pair, char* header){
 
 int open_serverfd(socket_t *pair)
 {
-  //char *server_ip = proxy_stat->wwwIP;
-  //char server_port[] = "8080";
   char *fake_ip = proxy_stat->fakeIP;
-  //unsigned short rand_port = rand()%100000;
   unsigned short rand_port = 0;
 
 	if(verbal)fprintf(stdout, "fake:%s\nwww:%s\n",proxy_stat->fakeIP, proxy_stat->wwwIP);
 
-	//int status, sock;
 	int sock;
-  //struct addrinfo hints;
-  //memset(&hints, 0, sizeof(struct addrinfo));
   struct addrinfo *servinfo;
   struct sockaddr_in addr;
-  //hints.ai_family = AF_UNSPEC;
-  //hints.ai_socktype = SOCK_STREAM;
-  //hints.ai_flags = AI_PASSIVE;
 
   addr.sin_family=AF_INET;
   addr.sin_addr.s_addr = inet_addr(fake_ip);
   addr.sin_port=htons(rand_port);
 
-/*
-  if((status = getaddrinfo(server_ip, server_port, &hints, &servinfo)) != 0){
-		fprintf(stderr, "getaddrinfo error\n");
-		return -1;
+	if(proxy_stat->wwwIP == NULL){
+		if(resolve("video.cs.cmu.edu", "8080", NULL, &servinfo) != 0){
+			fprintf(stderr, "getaddrinfo error in proxy_process\n");
+			exit(-1);
+		}
 	}
-*/
- //  if((status = getaddrinfo(fake_ip, rand_port, &hints, &addr)) != 0){
-	// 	fprintf(stderr, "getaddrinfo error\n");
- //    return -1;
-	// }
-
-
-	if(resolve("video.cs.cmu.edu", "8080", NULL, &servinfo) != 0){
-		fprintf(stderr, "getaddrinfo error in proxy_process\n");
-		exit(-1);
+	else{
+  	char *server_ip = proxy_stat->wwwIP;
+  	char server_port[] = "8080";
+  	struct addrinfo hints;
+  	memset(&hints, 0, sizeof(struct addrinfo));
+  	hints.ai_family = AF_UNSPEC;
+  	hints.ai_socktype = SOCK_STREAM;
+  	hints.ai_flags = AI_PASSIVE;
+  	if(getaddrinfo(server_ip, server_port, &hints, &servinfo) != 0){
+			fprintf(stderr, "getaddrinfo error\n");
+			return -1;
+		}	
 	}
 
 	if((sock = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol)) == -1){
@@ -169,7 +163,6 @@ int open_serverfd(socket_t *pair)
 	}
 
 	freeaddrinfo(servinfo);
-	// freeaddrinfo(addr);
 
   pair->server_fd = sock;
 

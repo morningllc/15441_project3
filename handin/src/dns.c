@@ -6,12 +6,12 @@
 #include "dns_robin.h"
 #include "graph.h"
 
-int verbal=1;
+int verbal=2;
 status_t* DNS_stat;
 
 int main(int argc, char **argv){
 	if(verbal)
-		fprintf(stdout,"--------------proxy start-----------------\n");
+		fprintf(stdout,"--------------DNS start-----------------\n");
 	int listenfd;
 	
 	fd_set read_set,write_set;
