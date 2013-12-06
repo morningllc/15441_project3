@@ -42,34 +42,6 @@ int parse(char *buf,size_t len,SA *addr){
 	packet_t *packet = (packet_t *) buf;
 
 	unsigned short requestID = packet->header.id;
-<<<<<<< HEAD
-	// if(packet->header.qr==1){
-		send_packet_t *sendPacket;
-		parseRequestData(packet->data,name);
-		fprintf(stdout,"name: %s\n",name);
-		if(!strcmp(name,REQUESTNAME)){
-			int datalen=buildResponseData(packet->data,len-HEADER_LEN,data,clientIP);
-	   		sendPacket=construct_response_packet(requestID,0,datalen,data,addr);
-		}else{
-			logWrite(clientIP,name,"0.0.0.0");
-			sendPacket=construct_response_packet(requestID,3,len-HEADER_LEN,packet->data,addr);
-		}
-
-		if(sendPacket!=NULL){
-			char *tmp = sendPacket->data->data;
-			tmp+=len-HEADER_LEN;
-			fprintf(stdout,"%d.%d.%d.%d\n",(int)(*(tmp+12)),(int)(*(tmp+13)),(int)(*(tmp+14)),(int)(*(tmp+15)));
-			enqueue(DNS_stat->send_packets,sendPacket);
-		}
-
-		if(verbal>1)
-		fprintf(stdout, "--------------in parse - done-------------\n");
-		return 0;
-	// }
-	// if(verbal>1)
-	// 	fprintf(stderr, "request is not a query\n");
-	// return -1;
-=======
 	send_packet_t *sendPacket;
 	parseRequestData(packet->data,name);
 	fprintf(stdout,"name: %s\n",name);
@@ -93,7 +65,6 @@ int parse(char *buf,size_t len,SA *addr){
 	if(verbal>1)
 	fprintf(stdout, "--------------in parse - done-------------\n");
 	return 0;
->>>>>>> b1fb6b1f2bd6794318f9c8e7bfbe10e1eb5777be
 
 }
 

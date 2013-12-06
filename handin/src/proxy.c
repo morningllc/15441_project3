@@ -239,12 +239,6 @@ void doIt_ReadClient(socket_t *pair){
 	}
 	
 }
-// int test(){
-// 	return 1;
-// }
-// void updateBitRate()
-// {
-// }
 
 /**
  * read and process data from server
@@ -273,7 +267,6 @@ void doIt_ReadServer(socket_t *pair)
 			pair->left = 0;
 			pair->contentlen = 0;
 			pair->server_stat = HEADER;
-			test();
 			return;
 		}
 		

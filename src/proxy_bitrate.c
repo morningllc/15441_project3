@@ -9,6 +9,10 @@ extern status_t *proxy_stat;
 extern int verbal;
 void update_bitrate(long long t1, long long t2, int size, int bit, char* chunkname, char *client_ip)
 {
+	if(t2-t1 < 10){
+		return;
+	}
+
 	float alpha = proxy_stat->alpha;
 	float t = (float)(((float)size)/((float)(t2-t1))) * 8000;
 	proxy_stat->t = alpha*t + (1.0-alpha)*proxy_stat->t;
@@ -20,7 +24,7 @@ void update_bitrate(long long t1, long long t2, int size, int bit, char* chunkna
 		proxy_stat->bitrate = next;
 	}
 
-	if(proxy_stat->t < proxy_stat->bitrate*1000){
+	if(proxy_stat->t < 1.5*proxy_stat->bitrate*1000){
 		proxy_stat->bitrate = prev;
 	}
 	if(verbal)

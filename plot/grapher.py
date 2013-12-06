@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
 import sys
-import numpy as np
 import matplotlib as mpl
+import numpy as np
 mpl.use('agg')
 import matplotlib.pyplot as plt
 import operator

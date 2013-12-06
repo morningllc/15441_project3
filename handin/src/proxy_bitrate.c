@@ -9,8 +9,12 @@ extern status_t *proxy_stat;
 extern int verbal;
 void update_bitrate(long long t1, long long t2, int size, int bit, char* chunkname, char *client_ip)
 {
+	if(t2-t1 < 10){
+		return;
+	}
+
 	float alpha = proxy_stat->alpha;
-	float t = (float)((size)/((t2-t1))) * 8000;
+	float t = (float)(((float)size)/((float)(t2-t1))) * 8000;
 	proxy_stat->t = alpha*t + (1.0-alpha)*proxy_stat->t;
 	
 	int next = next_bitrate();
@@ -20,21 +24,12 @@ void update_bitrate(long long t1, long long t2, int size, int bit, char* chunkna
 		proxy_stat->bitrate = next;
 	}
 
-	if(proxy_stat->t < proxy_stat->bitrate*1000){
+	if(proxy_stat->t < 1.5*proxy_stat->bitrate*1000){
 		proxy_stat->bitrate = prev;
 	}
 	if(verbal)
 		fprintf(stdout,"---------------------throughput = %lf -------------------\n",t/1000);
 
-<<<<<<< HEAD
-	if((float)(t2-t1)/1000 <= 0.01){
-		printf("t2 = %lld\n", t2);
-		printf("t1 = %lld\n", t1);
-		printf("t2-t1 = %lf\n",(float)(t2-t1)/1000 );
-		exit(0);
-	}
-=======
->>>>>>> b1fb6b1f2bd6794318f9c8e7bfbe10e1eb5777be
 	fprintf(stdout,"%.2f    %.2f   %d\n",t/1000,proxy_stat->t/1000,bit);
 	logWrite((float)(t2-t1)/1000, t/1000, proxy_stat->t/1000, bit, client_ip, chunkname);
 }
