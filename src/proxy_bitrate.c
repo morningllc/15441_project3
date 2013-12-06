@@ -10,7 +10,7 @@ extern int verbal;
 void update_bitrate(long long t1, long long t2, int size, int bit, char* chunkname, char *client_ip)
 {
 	float alpha = proxy_stat->alpha;
-	float t = (float)((size)/((t2-t1))) * 8000;
+	float t = (float)(((float)size)/((float)(t2-t1))) * 8000;
 	proxy_stat->t = alpha*t + (1.0-alpha)*proxy_stat->t;
 	
 	int next = next_bitrate();
